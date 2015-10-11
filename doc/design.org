@@ -91,10 +91,14 @@ handy.
 
 ** Transactions
 
-Transactions are surprisingly hard to achieve. GNU Guix (and its
-sibling Nix) have the right idea: Create a new directory for files and
-symlink to that in the final step. Nothing is visible until the
-symlink changes. Rolling back is simply replacing a symlink.
+Transactions are surprisingly hard to achieve. The idea is to have
+either the start or end state, but not what happens in between.  Think
+of what happens during an install when electricity fails.
+
+GNU Guix (and its sibling Nix) have the right idea: Create a new
+directory for files and symlink to that in the final step. Nothing is
+visible until the symlink changes. Rolling back is simply replacing a
+symlink.
 
 We will use GNU Guix for some stuff. So that is tactic one. 
 
@@ -103,18 +107,40 @@ ourselves.
 
 Tactic three is to use git and roll-back on git.
 
+Tactic four is to capture error conditions and roll back.
+
+Just as an example, I use stunnel which has a configuration file
+in /etc/stunnel/. With GNU Guix that file would be encoded and
+hosted inside the stunnel store path. Rather clean! 
+
+If we were to use a symlink, we'll symlink from
+/etc/deploy/stunnel/stunnel-1, that would work too.
+
+With git it is harder. The information about backtracking would be
+contained in /etc/.git and manually restored.
+
+With capturing error conditions we can maintain information in RAM and
+write back the originals if the transaction does not complete.  Main
+problem is for disruptions to a running install, i.e., what happens in
+case of electricity failure?
+
 ** Modules 
 
 A module is an independent entity. For example configuring vim
-is independent of configuring emacs.
+is independent of configuring emacs. A module is also a transaction.
+
+We should be able to specify what modules to run or skip. For example
+a directory cleaning module could normally be skipped.
 
 ** Parallelism
 
-Independent modules can be executed in parallel. 
+Independent modules can be executed in parallel because modules are
+transactions.
 
 ** Fine grained output
 
-Output should be fine grained and easy to control. 
+Output should be fine grained and easy to control. Too much output
+and people stop reading them. 
 
 * Install GNU Guix, ruby, git and deploy
 
