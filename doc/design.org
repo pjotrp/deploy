@@ -1,0 +1,88 @@
+#+TITLE: Deploy design
+
+
+* Table of Contents                                                     :TOC:
+ - [[#introduction][Introduction]]
+ - [[#install-gnu-guix-ruby-and-git][Install GNU Guix, ruby and git]]
+
+* Introduction
+
+`deploy' is a deployment tool which operates in the same domain as
+Chef, Puppet, Cfengine and Cfruby. I have used all. Actually, I
+created Cfruby with David Powers many years ago, the start was
+probably in 2005 and sloccount estimates 2.5 years of
+development. Cfruby was more of a Cfengine clone that works without a
+server and I have been using it to manage work environments, mail
+servers and web servers, all those years. Cfruby is showing its
+age. It has good ideas, but somehow it is (still) too complicated or
+too simple (depending on how you look at it). Also I want it to run
+faster and use parallelisation.
+
+So, what do I want out of a deployment tool? First of all it has to
+copy configuration files from a git repository to defined places on a
+host. That, by far, is the most important idea and requires a place to
+store files and a mapping to the destination.
+
+Second, I like the idea of (overlapping) machine classes as introduced
+by Cfengine. So you can say that hostname is part of the webserver
+class and also runs ssh (the ssh-server class). The mapping and global
+configuration will be in YAML (this time).
+
+Third, we want to be able to list properties of a machine. This means
+we have to have an intermediate representation. Something that Cfruby 
+misses and GNU Guix has.
+
+Fourth, we want fine grained output that can be configured. Cfruby
+went some way here, but I did not use it much because it was not good
+enough.
+
+Fifth, we don't want a client/server environment like the others have.
+I strongly believe in simple tools and a runner + git checkout should
+reflect the state of each machine. The simple runner can be run via
+ssh to create a client/server setup.
+
+Sixth, the configuration has to be simple. Really simple. In Cfruby we
+created a Cfengine-type language. The problem with that is that you
+have to understand that DSL. I think the idea of combining YAML with
+Ruby is the way forward. Guile S-EXP would be even better (perhaps),
+but we can add that as a front-end later. The intermediate
+representation should help there.
+
+Seventh, configuration can happen in parallel to speed things up, but
+I said that already.
+
+`deploy' will be part of the GNU Guix setup. So install Guix and you
+should be set to run this system. With a simple:
+
+: deploy git://mygitserver/myenvironment.git
+
+Will anyone use this? I don't know. The point is that it saves me a
+lot of time to have this type of functionality on the systems I
+manage. Sometimes (indeed) it is easier to write your own software.
+
+* Install GNU Guix, ruby and git
+
+Follow the instruction on the Guix website. Basically, download the
+tarball, unpack it, copy the relevant dirs, add the relevant groups
+and users and start the Guix daemon.
+
+Once it is running update Guix
+
+: guix pull
+
+and now we need git and ruby to deploy
+
+: guix package -i ruby git
+
+and set the path:
+
+:  export PATH="/root/.guix-profile/bin:/root/.guix-profile/sbin"
+:  export GEM_PATH="/root/.guix-profile/lib/ruby/gems/2.2.0"
+
+Note that if you deploy these tools to multiple freshly installed
+servers it may be worth using the guix archive functions to speed
+things up, or even create your own tarball of guix (make sure to
+include the database in /var).
+
+
+
