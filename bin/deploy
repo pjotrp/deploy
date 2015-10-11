@@ -1,0 +1,85 @@
+#!/usr/bin/env ruby
+#
+
+USAGE = """
+Valid commands are 'run'
+
+Example:
+
+  deploy run git://mygitrepos/myhomedir.git
+  deploy run git://mygitrepos/myservers.git
+
+Use --help for info
+"""
+
+gempath = File.dirname(File.dirname(__FILE__))
+$: << File.join(gempath,'lib')
+
+VERSION_FILENAME=File.join(gempath,'VERSION')
+version = File.new(VERSION_FILENAME).read.chomp
+
+if ARGV.size == 0
+  print USAGE
+end
+
+# require 'deploy'
+require 'optparse'
+
+options = {task: nil, show_help: false}
+            
+opts = OptionParser.new do |o|
+  o.banner = "Usage: #{File.basename($0)} command [options]\n"
+
+  o.on("-q", "--quiet", "Run quietly") do |q|
+    options[:quiet] = true
+  end
+   
+  o.on("-v","--verbose", "Run verbosely") do |v|
+    options[:verbose] = true
+  end
+   
+  o.on("-d", "--debug", "Debug mode") do |v|
+    options[:debug] = true
+  end
+
+  o.on("-i", "--ignore-errors", "Continue on error") do 
+    options[:ignore_errors] = true
+  end
+   
+  o.separator ""
+  o.on_tail('-h', '--help', 'display this help and exit') do
+    options[:show_help] = true
+  end
+end
+
+begin
+  opts.parse!(ARGV)
+
+  options[:task] = ARGV.shift.to_sym
+  
+  $stderr.print "deploy #{version} (biogem Ruby #{RUBY_VERSION}) by Pjotr Prins 2014\n" if !options[:quiet]
+
+  if options[:show_help]
+    print opts 
+    print USAGE
+    exit 1
+  end
+
+  $stderr.print "Options: ",options,"\n" if !options[:quiet]
+
+rescue OptionParser::InvalidOption => e
+  options[:invalid_argument] = e.message
+end
+
+# (0..options[:header]).each { STDIN.gets }
+
+case options[:task] 
+  when :run then
+    # require 'deploy/store'
+    Deploy::Runner.run(options,ARGV.shift)
+  when :match ,:delete then
+    require 'deploy/match'
+    BioLocus::Match.run(options)
+  else
+    raise "I do not know what to do!"
+end

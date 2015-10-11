@@ -3,7 +3,16 @@
 
 * Table of Contents                                                     :TOC:
  - [[#introduction][Introduction]]
- - [[#install-gnu-guix-ruby-and-git][Install GNU Guix, ruby and git]]
+ - [[#design-of-deploy][Design of `deploy']]
+   - [[#configuration-language][Configuration `language']]
+   - [[#intermediate-representation][Intermediate representation]]
+   - [[#transactions][Transactions]]
+   - [[#modules-][Modules ]]
+   - [[#parallelism][Parallelism]]
+   - [[#fine-grained-output][Fine grained output]]
+ - [[#install-gnu-guix-ruby-git-and-deploy][Install GNU Guix, ruby, git and deploy]]
+ - [[#setting-up-a-deployment-definition][Setting up a deployment definition]]
+   - [[#server][Server]]
 
 * Introduction
 
@@ -20,8 +29,9 @@ faster and use parallelisation.
 
 So, what do I want out of a deployment tool? First of all it has to
 copy configuration files from a git repository to defined places on a
-host. That, by far, is the most important idea and requires a place to
-store files and a mapping to the destination.
+host. That, by far, is the most important idea (I thank Kent Skaar for
+introducing me to Cfengine around 2000) and requires a place to store
+files and a mapping to the destination.
 
 Second, I like the idea of (overlapping) machine classes as introduced
 by Cfengine. So you can say that hostname is part of the webserver
@@ -51,6 +61,10 @@ representation should help there.
 Seventh, configuration can happen in parallel to speed things up, but
 I said that already.
 
+Eight, transaction support. Every 'module' should complete completely,
+or not. The machine state should be in before or after. Not in
+between. Ah yes, the concept of modules is there too.
+
 `deploy' will be part of the GNU Guix setup. So install Guix and you
 should be set to run this system. With a simple:
 
@@ -60,19 +74,67 @@ Will anyone use this? I don't know. The point is that it saves me a
 lot of time to have this type of functionality on the systems I
 manage. Sometimes (indeed) it is easier to write your own software.
 
-* Install GNU Guix, ruby and git
+* Design of `deploy'
 
-Follow the instruction on the Guix website. Basically, download the
-tarball, unpack it, copy the relevant dirs, add the relevant groups
-and users and start the Guix daemon.
+** Configuration `language'
 
-Once it is running update Guix
+Configuration will be a compination of YAML and simple Ruby and/or
+Guile. Depending on needs and preferences. You can write deploy
+definitions with YAML and Ruby, YAML and Guile, or all three.
+
+** Intermediate representation
+
+An intermediate representation of actions allows us to create
+views on that data. Also, for rolling back and deciding on 
+parallel execution, the intermediate representation comes in
+handy.
+
+** Transactions
+
+Transactions are surprisingly hard to achieve. GNU Guix (and its
+sibling Nix) have the right idea: Create a new directory for files and
+symlink to that in the final step. Nothing is visible until the
+symlink changes. Rolling back is simply replacing a symlink.
+
+We will use GNU Guix for some stuff. So that is tactic one. 
+
+Tactic two is to use the same symlink idea, but to implement it
+ourselves.
+
+Tactic three is to use git and roll-back on git.
+
+** Modules 
+
+A module is an independent entity. For example configuring vim
+is independent of configuring emacs.
+
+** Parallelism
+
+Independent modules can be executed in parallel. 
+
+** Fine grained output
+
+Output should be fine grained and easy to control. 
+
+* Install GNU Guix, ruby, git and deploy
+
+Note: GNU Guix is optional for running `deploy'. But if you want sane
+and reproducible system installation, GNU Guix is the way to go. Also,
+we will (sometimes) use GNU Guix for deployment itself. GNU Guix
+shines where it comes to transactions, for example.
+
+Follow the tar installation instruction on the Guix
+website. Basically, download the tarball, unpack it, copy the relevant
+dirs to /gnu and /var/gnu, add the relevant groups and users, and
+start the Guix daemon.
+
+Once Guix is running update Guix
 
 : guix pull
 
-and now we need git and ruby to deploy
+and now we need guix, guile, ruby and git to run deploy
 
-: guix package -i ruby git
+: guix package -i guix guile ruby git 
 
 and set the path:
 
@@ -83,6 +145,63 @@ Note that if you deploy these tools to multiple freshly installed
 servers it may be worth using the guix archive functions to speed
 things up, or even create your own tarball of guix (make sure to
 include the database in /var).
+
+To install deploy (for now) we checkout the git repo itself.
+
+: git clone git://github.com/pjotrp/deploy.git
+
+And you should be able to run
+
+: ./deploy/bin/deploy
+
+* Setting up a deployment definition
+
+The first step is to set up a git repository to store the
+definition. Here we are going to set up two examples, one for a server
+installation and one for a HOME directory. Unsurprisingly 
+I use both.
+
+** Server
+
+First the server. In the fresh git repo we add a YAML file named
+'machines.yaml' that defines the host and the classes it belongs
+to. E.g.
+
+#+BEGIN_EXAMPLE
+classes:
+  - any:
+    - ssh
+    - guix
+myhost01:
+  - webserver
+#+END_EXAMPLE
+
+Where myhost01 is a hostname or group of hosts.
+
+With Cfruby and cfengine classes were defined differently, but I like
+this approach because it clearly lists what a machine should be doing.
+Note: classes can be higher level abstractions and the host can also
+be 'any' so this git repository definition is relevant to all
+machines. So you can also write
+
+#+BEGIN_EXAMPLE
+groups:
+  webservers:
+    - myhost01
+classes:
+  - any:
+    - ssh
+    - guix
+  - webservers:
+    - webserver
+#+END_EXAMPLE
+
+
+To run this file simply point to the base directory or git repo, i.e.
+
+: deploy run serverrepo
+
+which will pick up the machines.yaml filedash from ./serverrepo/ dir.
 
 
 
