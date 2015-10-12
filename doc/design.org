@@ -4,7 +4,7 @@
 * Table of Contents                                                     :TOC:
  - [[#introduction][Introduction]]
  - [[#design-of-deploy][Design of `deploy']]
-   - [[#configuration-language][Configuration `language']]
+   - [[#a-configuration-language][A configuration `language']]
    - [[#intermediate-representation][Intermediate representation]]
    - [[#transactions][Transactions]]
    - [[#modules-][Modules ]]
@@ -12,7 +12,11 @@
    - [[#fine-grained-output][Fine grained output]]
  - [[#install-gnu-guix-ruby-git-and-deploy][Install GNU Guix, ruby, git and deploy]]
  - [[#setting-up-a-deployment-definition][Setting up a deployment definition]]
-   - [[#server][Server]]
+   - [[#machines][Machines]]
+   - [[#classes][Classes]]
+   - [[#modules][Modules]]
+   - [[#copy-files][Copy files]]
+   - [[#edit-files][Edit files]]
 
 * Introduction
 
@@ -36,7 +40,8 @@ files and a mapping to the destination.
 Second, I like the idea of (overlapping) machine classes as introduced
 by Cfengine. So you can say that hostname is part of the webserver
 class and also runs ssh (the ssh-server class). The mapping and global
-configuration will be in YAML (this time).
+configuration will be in YAML (this time, sorry David Powers for
+ignoring your idea).
 
 Third, we want to be able to list properties of a machine. This means
 we have to have an intermediate representation. Something that Cfruby 
@@ -76,11 +81,18 @@ manage. Sometimes (indeed) it is easier to write your own software.
 
 * Design of `deploy'
 
-** Configuration `language'
+** A configuration `language'
 
 Configuration will be a compination of YAML and simple Ruby and/or
 Guile. Depending on needs and preferences. You can write deploy
-definitions with YAML and Ruby, YAML and Guile, or all three.
+definitions with YAML and Ruby, YAML and Guile, or all three. Scripts
+can be written in any language. All `deploy' does is provide the
+framework. 
+
+The basic framework is written in Ruby, the reason being that we have
+so much useful code already in Cfruby. In time, some of it may migrate
+to Guile. Personally I am not too concerned about mixing languages -
+thanks to GNU Guix there is no deployment issue there.
 
 ** Intermediate representation
 
@@ -114,15 +126,18 @@ in /etc/stunnel/. With GNU Guix that file would be encoded and
 hosted inside the stunnel store path. Rather clean! 
 
 If we were to use a symlink, we'll symlink from
-/etc/deploy/stunnel/stunnel-1, that would work too.
+/etc/deploy/stunnel/stunnel-1 to /etc/stunnel, that would work too.
+Arguably the directory should be /var/deploy/stunnel, but I think
+in this case I prefer to see what is happening in /etc.
 
 With git it is harder. The information about backtracking would be
-contained in /etc/.git and manually restored.
+contained in /etc/.git (which I also use) and manually restored.
 
-With capturing error conditions we can maintain information in RAM and
-write back the originals if the transaction does not complete.  Main
-problem is for disruptions to a running install, i.e., what happens in
-case of electricity failure?
+With the final option, capturing error conditions, we can maintain
+previous state (somewhere) and write back the originals if the
+transaction does not complete.  Main problem is for disruptions to a
+running install, i.e., what happens in case of electricity failure?
+Maybe we should skip this option.
 
 ** Modules 
 
@@ -187,10 +202,10 @@ definition. Here we are going to set up two examples, one for a server
 installation and one for a HOME directory. Unsurprisingly 
 I use both.
 
-** Server
+** Machines
 
 First the server. In the fresh git repo we add a YAML file named
-'machines.yaml' that defines the host and the classes it belongs
+'classes.yaml' that defines the host and the classes it belongs
 to. E.g.
 
 #+BEGIN_EXAMPLE
@@ -198,8 +213,9 @@ classes:
   - any:
     - ssh
     - guix
-myhost01:
-  - webserver
+machines:
+  myhost01:
+    - webserver
 #+END_EXAMPLE
 
 Where myhost01 is a hostname or group of hosts.
@@ -212,22 +228,76 @@ machines. So you can also write
 
 #+BEGIN_EXAMPLE
 groups:
-  webservers:
+  git_webservers:
     - myhost01
 classes:
   - any:
     - ssh
     - guix
-  - webservers:
-    - webserver
+  - git_webservers:
+    - https
+    - git
 #+END_EXAMPLE
 
+So myhost01 is a member of the group git_webservers. These 
+webservers are part of ssy, guix, https, and git classes.
 
 To run this file simply point to the base directory or git repo, i.e.
 
 : deploy run serverrepo
 
-which will pick up the machines.yaml filedash from ./serverrepo/ dir.
+which will pick up the classes.yaml from ./serverrepo/ dir.
 
+** Classes
 
+Classes are simply groupings of functionality. These classes are
+referred to in modules, rather than hostnames (though that is possible
+too).
+
+** Modules
+
+Modules are self contained (in principle independent) installation
+descriptions. A module can create dirs, install software, copy files,
+edit files, etc. etc. An ssh installation would be one module. A
+webserver would be one module. An emacs or vim configuration in the
+HOME directory would be one module. Modules are simply listed in
+directory 'config'. The config directory is walked to find modules.
+
+In principle modules are independent so they can run in any order. It
+is possible, however, to state that one module depends on another
+with the require descriptor. So a git webserver can depend on git.
+
+At runtime the dependencies are ordered for execution.
+
+** Copy files
+
+So a module for ssh could copy the sshd_config file for a certain
+class. The convention is to store such files in
+./masterfiles/class/filename. In ./config/ssh.yaml we could define
+
+#+BEGIN_EXAMPLE
+dir:
+  "/etc/ssh":
+    - mode: "0755"
+    - user: "root"
+    - group: "root"
+file:
+  "sshd_conf":
+    - dest: "/etc/ssh"
+    - mode: "0400"
+#+END_EXAMPLE
+
+Actually the settings are defaults, so you can do
+
+#+BEGIN_EXAMPLE
+dir: "/etc/ssh"
+file:
+  "sshd_conf":
+    - dest "/etc/ssh"
+#+END_EXAMPLE
+
+The Guile S-EXP version will be even more simple because we can remove
+the duplication. But that is for later.
+
+** Edit files
 
