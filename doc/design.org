@@ -9,6 +9,7 @@
    - [[#transactions][Transactions]]
    - [[#modules-][Modules ]]
    - [[#parallelism][Parallelism]]
+   - [[#interference-and-locking][Interference and locking]]
    - [[#fine-grained-output][Fine grained output]]
  - [[#install-gnu-guix-ruby-git-and-deploy][Install GNU Guix, ruby, git and deploy]]
  - [[#setting-up-a-deployment-definition][Setting up a deployment definition]]
@@ -17,6 +18,8 @@
    - [[#modules][Modules]]
    - [[#copy-files][Copy files]]
    - [[#edit-files][Edit files]]
+ - [[#use-cases][Use cases]]
+   - [[#configuration-files][Configuration files]]
 
 * Introduction
 
@@ -68,7 +71,7 @@ I said that already.
 
 Eight, transaction support. Every 'module' should complete completely,
 or not. The machine state should be in before or after. Not in
-between. Ah yes, the concept of modules is there too.
+between. Ah yes, the concept of modules and file locking is there too.
 
 `deploy' will be part of the GNU Guix setup. So install Guix and you
 should be set to run this system. With a simple:
@@ -152,10 +155,25 @@ a directory cleaning module could normally be skipped.
 Independent modules can be executed in parallel because modules are
 transactions.
 
+** Interference and locking
+
+Modules interfere when they need to edit the same file, e.g., firewall
+rules or hosts.allow.  One of the mistakes we made in Cfruby is that
+when two 'modules' changed a file there could be a conflict.  Cfruby
+had no locking in place and that would lead to trouble.
+
+Another aspect of interference is between two different deployment
+runs. If we are to track different runs a database should be in place.
+At this point I think we should opt for a NoSQL database in
+/var/deploy or $HOME/.deploy/ (when run as a normal user) which allows
+for locking between different runs and roll-backs too.
+
 ** Fine grained output
 
-Output should be fine grained and easy to control. Too much output
-and people stop reading them. 
+Output should be fine grained and easy to control. Too much output and
+people stop reading them. Output should be written to disk on
+completion of a module, collected at the end of a run and sorted by
+priority for display.
 
 * Install GNU Guix, ruby, git and deploy
 
@@ -301,3 +319,46 @@ the duplication. But that is for later.
 
 ** Edit files
 
+* Use cases
+
+** Configuration files
+
+The first use case is configuring a tool that has a config file
+in /etc. In this case we'll configure vpnc.
+
+vpnc expects a file /etc/vpnc/default.conf.
+
+We create the file and store it in a git repository named vpns/.
+In there we have a classes.yaml containing something like
+
+#+BEGIN_EXAMPLE
+classes:
+  - vpnc
+machines:
+  any:
+    - vpnc
+#+END_EXAMPLE
+
+So anyone running this repository will get vpnc configured.
+
+In config/vpnc.yaml we'll have
+
+#+BEGIN_EXAMPLE
+guix:
+  - vpnc
+dir:
+  - "/etc/vpnc"
+    - mode: "0700"
+file:
+  - default.conf:
+    - dest: "/etc/vpnc"
+    - mode: "0400"
+#+END_EXAMPLE
+
+So GNU Guix installs the latest software package and default.conf gets
+copied from ./masterfiles/vpnc/default.conf into the destination with
+appropriate permissions.
+
+A future version of `deploy' will actually create a versioned
+directory in /etc/deploy/vpnc/vpn-1/ and symlink to that to ascertain
+transactions and allow for roll-backs.
