@@ -230,7 +230,7 @@ to. E.g.
 
 #+BEGIN_EXAMPLE
 classes:
-  - any:
+  any:
     - ssh
     - guix
 machines:
@@ -249,12 +249,12 @@ machines. So you can also write
 #+BEGIN_EXAMPLE
 groups:
   git_webservers:
-    - myhost01
+    myhost01
 classes:
-  - any:
+  any:
     - ssh
     - guix
-  - git_webservers:
+  git_webservers:
     - https
     - git
 #+END_EXAMPLE
@@ -300,7 +300,6 @@ The convention for masterfiles is that they are relative to
 repository/masterfiles/module/. If that module dir is missing the
 masterfiles are simply relative to repository/masterfiles/.
 
-
 ** Copy files
 
 So a module for ssh could copy the sshd_config file for a certain
@@ -308,28 +307,87 @@ class. The convention is to store such files in
 ./masterfiles/class/filename. In ./config/ssh.yaml we could define
 
 #+BEGIN_EXAMPLE
-dir:
-  "/etc/ssh":
-    - mode: "0755"
-    - user: "root"
-    - group: "root"
-file:
-  "sshd_conf":
-    - dest: "/etc/ssh"
-    - mode: "0400"
+- dir:
+    /etc/ssh:
+      mode: "0755"
+      user: "root"
+      group: "root"
+- file:
+    sshd_conf:
+      mode: "0400"
 #+END_EXAMPLE
 
 Actually the settings are defaults, so you can do
 
 #+BEGIN_EXAMPLE
-dir: "/etc/ssh"
-file:
-  "sshd_conf":
-    - dest "/etc/ssh"
+- dir: "/etc/ssh"
+- file:
+    sshd_conf:
 #+END_EXAMPLE
+
+Note that the last dir gets picked up as a destination.
 
 The Guile S-EXP version will be even more simple because we can remove
 the duplication. But that is for later.
+
+*** Copy multiple files
+
+An emacs configuration in $HOME could look like
+
+#+BEGIN_EXAMPLE
+---
+- file:
+    emacs:
+      dest: .emacs
+      mode: "400"
+- dir:
+    .emacs.d:
+    .emacs.d/lisp:
+- file:
+    emacs.d/lisp/markdown-mode.el:
+- dir:
+    .emacs.d/org:
+- file:
+    emacs.d/org/ox-rss.el:
+    emacs.d/org/toc-org.el:
+- dir:
+    .emacs.d/themes:
+- file:
+    emacs.d/themes/dark-blue-theme.el:
+    emacs.d/themes/zenburn-theme.el:
+#+END_EXAMPLE
+
+but there is a simpler version. We can glob files with recursion this way
+
+#+BEGIN_EXAMPLE
+---
+- file:
+    emacs:
+      dest: .emacs
+      mode: "400"
+- dir:
+    .emacs.d:
+- files:
+    emacs.d/*/**:
+#+END_EXAMPLE
+
+which copies the directory structure in masterfiles/emacs.d to
+~/.emacs.d/ as in
+
+#+BEGIN_EXAMPLE
+./masterfiles/emacs/
+├── emacs
+└── emacs.d
+    ├── lisp
+    │   └── markdown-mode.el
+    ├── org
+    │   ├── ox-rss.el
+    │   └── toc-org.el
+    └── themes
+        ├── dark-blue-theme.el
+        └── zenburn-theme.el
+#+END_EXAMPLE
+
 
 ** Edit files
 

@@ -1,6 +1,6 @@
 Deployment system for servers and home directories.  In conjuction
 with GNU Guix and (perhaps) the common workflow langauge (CWL)
-essentially a replacement for Pupput, Chef, Cfengine, Cfruby, GNU
+essentially a replacement for Puppet, Chef, Cfengine, Cfruby, GNU
 stow, etc.  See the doc/design.org document for more.
 
 Historic note: at the time of Cfruby I decided that Cfruby was to be
