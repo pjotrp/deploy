@@ -17,9 +17,11 @@ Pjotr Prins (c) 2015
 Deploy is developed in JIT fashion. First steps are:
 
 1. Get machine status (hostname, username, homedir) (done)
-2. Read command file
-3. Implement file copy
-4. Implement (simple) file edit
+2. Read command file (done)
+3. Implement mkdir (done)
+4. Implement file copy
+5. Implement (simple) file edit
+6. Use intermediate data format
 
 Sorry, initially, no transactions, parallelization, fancy error
 reporting etc. But it will come!  I have to start somewhere.  Call it
