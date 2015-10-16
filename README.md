@@ -1,9 +1,27 @@
-Deployment system for servers and home directories. See the
-doc/design.org document for more.
+Deployment system for servers and home directories.  In conjuction
+with GNU Guix and (perhaps) the common workflow langauge (CWL)
+essentially a replacement for Pupput, Chef, Cfengine, Cfruby, GNU
+stow, etc.  See the doc/design.org document for more.
 
-Early days, YMMV.
+Historic note: at the time of Cfruby I decided that Cfruby was to be
+one of my last `large' software projects.  How these things come to
+haunt you! Deploy is bound to be a large project, again.
+
+Early days for deploy, YMMV.
 
 Pjotr Prins (c) 2015
+
+# Implementation (JIT)
+
+Deploy is developed in JIT fashion. First steps are:
+
+1. Get machine status (hostname, username, homedir)
+2. Read command file
+3. Implement file copy
+4. Implement (simple) file edit
+
+So, initially, no transactions, parallelization, fancy error reporting
+etc. But it will come!  I have to start somewhere.
 
 # License
 
