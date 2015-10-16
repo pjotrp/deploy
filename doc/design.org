@@ -113,7 +113,8 @@ of what happens during an install when electricity fails.
 GNU Guix (and its sibling Nix) have the right idea: Create a new
 directory for files and symlink to that in the final step. Nothing is
 visible until the symlink changes. Rolling back is simply replacing a
-symlink.
+symlink (btw. the much older GNU Stow does something similar with
+symlinks).
 
 We will use GNU Guix for some stuff. So that is tactic one. 
 

@@ -24,6 +24,7 @@ end
 
 # require 'deploy'
 require 'optparse'
+require 'deploy'
 
 options = {task: nil, show_help: false}
             
@@ -55,7 +56,11 @@ end
 begin
   opts.parse!(ARGV)
 
-  options[:task] = ARGV.shift.to_sym
+  if ARGV.size > 0
+    options[:task] = ARGV.shift.to_sym
+  else
+    options[:show_help] = true
+  end
   
   $stderr.print "deploy #{version} (biogem Ruby #{RUBY_VERSION}) by Pjotr Prins 2014\n" if !options[:quiet]
 
@@ -71,15 +76,9 @@ rescue OptionParser::InvalidOption => e
   options[:invalid_argument] = e.message
 end
 
-# (0..options[:header]).each { STDIN.gets }
-
 case options[:task] 
   when :run then
-    # require 'deploy/store'
-    Deploy::Runner.run(options,ARGV.shift)
-  when :match ,:delete then
-    require 'deploy/match'
-    BioLocus::Match.run(options)
+    Deploy::Runner.run(options,ARGV.first)
   else
     raise "I do not know what to do!"
 end
