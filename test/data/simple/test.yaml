@@ -1,0 +1,7 @@
+dir:
+  ".test_deploy":
+    - mode: "0755"
+file:
+  "test.conf":
+    - dest: ".test_deploy/
+    - mode: "0400"

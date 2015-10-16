@@ -5,7 +5,8 @@ stow, etc.  See the doc/design.org document for more.
 
 Historic note: at the time of Cfruby I decided that Cfruby was to be
 one of my last `large' software projects.  How these things come to
-haunt you! Deploy is bound to be a large project, again.
+haunt you! Cfruby is showing its age and now Deploy is bound to be a
+large project, again.
 
 Early days for deploy, YMMV.
 
@@ -15,13 +16,14 @@ Pjotr Prins (c) 2015
 
 Deploy is developed in JIT fashion. First steps are:
 
-1. Get machine status (hostname, username, homedir)
+1. Get machine status (hostname, username, homedir) (done)
 2. Read command file
 3. Implement file copy
 4. Implement (simple) file edit
 
-So, initially, no transactions, parallelization, fancy error reporting
-etc. But it will come!  I have to start somewhere.
+Sorry, initially, no transactions, parallelization, fancy error
+reporting etc. But it will come!  I have to start somewhere.  Call it
+agility ;)
 
 # License
 
