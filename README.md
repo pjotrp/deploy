@@ -19,7 +19,7 @@ Deploy is developed in JIT fashion. First steps are:
 1. Get machine status (hostname, username, homedir) (done)
 2. Read command file (done)
 3. Implement mkdir (done)
-4. Implement file copy
+4. Implement file copy (done)
 5. Implement (simple) file edit
 6. Use intermediate data format
 

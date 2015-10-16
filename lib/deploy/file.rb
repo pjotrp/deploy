@@ -12,7 +12,7 @@ module Deploy
       end
       # p File.stat(dest).mode.to_s(2)
       # p 0222.to_s(2)
-      if (File.stat(dest).mode & 0222)
+      if (File.exist?(dest) and (File.stat(dest).mode & 0222))
         chmod(dest,0600)  # until we have checking in place, override mode for writing
       end
       FileUtils.copy_file(source,dest)

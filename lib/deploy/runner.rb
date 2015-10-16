@@ -15,7 +15,7 @@ module Deploy
 
       # Now run the files in $rundir/config
       Dir.glob(rundir+'/config/*.yaml').each do | fn |
-        Command.exec(fn,rundir)
+        Command.exec(fn,rundir,state)
       end 
       state
     end
