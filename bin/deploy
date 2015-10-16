@@ -4,7 +4,11 @@
 USAGE = """
 Valid commands are 'run'
 
-Example:
+Examples:
+
+  ./bin/deploy run test/data/simple
+
+or
 
   deploy run git://mygitrepos/myhomedir.git
   deploy run git://mygitrepos/myservers.git

@@ -11,7 +11,12 @@ module Deploy
       # Fetch machine state
       state = State.new
       p state
-      Command.exec(rundir)
+      # Fetch classes
+
+      # Now run the files in $rundir/config
+      Dir.glob(rundir+'/config/*.yaml').each do | fn |
+        Command.exec(fn)
+      end 
       state
     end
     
