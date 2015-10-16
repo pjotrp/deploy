@@ -16,6 +16,8 @@
    - [[#machines][Machines]]
    - [[#classes][Classes]]
    - [[#modules][Modules]]
+   - [[#config-files][Config files]]
+   - [[#master-files][Master files]]
    - [[#copy-files][Copy files]]
    - [[#edit-files][Edit files]]
  - [[#use-cases][Use cases]]
@@ -286,6 +288,18 @@ is possible, however, to state that one module depends on another
 with the require descriptor. So a git webserver can depend on git.
 
 At runtime the dependencies are ordered for execution.
+
+** Config files
+
+The convention for config files (aka as modules) is that they reside
+in the repository/config/*.yaml
+
+** Master files
+
+The convention for masterfiles is that they are relative to 
+repository/masterfiles/module/. If that module dir is missing the
+masterfiles are simply relative to repository/masterfiles/.
+
 
 ** Copy files
 

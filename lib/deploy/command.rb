@@ -7,9 +7,14 @@ module Deploy
     # This is the exec function for one module (YAML file). Note that
     # it acts in a closure. So the last dir is shared in file.
     def Command.exec(fn,rundir,state)
-      destdir = nil
       print "Run "+fn+"\n"
       list = YAML.load(File.read(fn))
+      p list
+      destdir = nil
+      masterfiles = rundir + '/masterfiles/' + File.basename(fn,'.yaml')
+      if not File.directory?(masterfiles)
+        masterfiles = rundir + '/masterfiles'
+      end
       list.each do | commands |
         commands.each do | command, items |
           p command
@@ -18,7 +23,7 @@ module Deploy
             items.each do |item,opts|
               p [item,opts]
               mode = 0755 # default
-              mode = opts['mode'].to_i(8) if opts['mode']
+              mode = opts['mode'].to_i(8) if opts and opts['mode']
               # if it is not absolute, make it relative to $HOME
               dest = item
               if dest[0] != '/'
@@ -36,9 +41,9 @@ module Deploy
             items.each do |item,opts|
               p [item,opts]
               mode = 0644 # default
-              mode = opts['mode'].to_i(8) if opts['mode']
+              mode = opts['mode'].to_i(8) if opts and opts['mode']
               dest =
-                if opts['dest']
+                if opts and opts['dest']
                   opts['dest']
                 else
                   destdir
@@ -49,7 +54,7 @@ module Deploy
                 dest = state.homedir + '/' + dest
               end
               # source is a masterfile
-              source = rundir+'/masterfiles/'+item
+              source = masterfiles+'/'+item
               newfn = FileOps.copy_file(source,dest)
               FileOps.chmod(newfn,mode)
             end

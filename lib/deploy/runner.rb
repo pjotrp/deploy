@@ -12,6 +12,9 @@ module Deploy
       state = State.new
       p state
       # Fetch classes
+      if not File.directory?(rundir)
+        raise "Rundir is missing #{rundir}"
+      end
 
       # Now run the files in $rundir/config
       Dir.glob(rundir+'/config/*.yaml').each do | fn |
