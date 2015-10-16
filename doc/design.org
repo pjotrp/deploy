@@ -368,7 +368,7 @@ but there is a simpler version. We can glob files with recursion this way
 - dir:
     .emacs.d:
 - files:
-    emacs.d/*/**:
+    emacs.d/**/*:
 #+END_EXAMPLE
 
 which copies the directory structure in masterfiles/emacs.d to
@@ -388,6 +388,8 @@ which copies the directory structure in masterfiles/emacs.d to
         └── zenburn-theme.el
 #+END_EXAMPLE
 
+The .emacs needs to be specified separately because it goes directly
+into $HOME.
 
 ** Edit files
 
