@@ -4,7 +4,6 @@ require 'fileutils'
 
 module Deploy
   module FileOps
-
     
     def FileOps.copy_file(source,dest)
       p ["copy_file",source,dest]
@@ -23,7 +22,7 @@ module Deploy
     def FileOps.copy_recursive(source,destdir)
       # Using a system copy here because we don't want the added
       # source directory
-      print `cp -vau #{source+'/*'} #{destdir}`
+      print `cp -vuP #{source+'/*'} #{destdir}`
     end
     
     def FileOps.chmod(item,mode=0755)

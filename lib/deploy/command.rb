@@ -23,6 +23,9 @@ module Deploy
         if not File.exist?(source)
           source = masterfiles+'/'+name
         end
+        if not File.exist?(source)
+          source = masterfiles
+        end
         source
       }
 
@@ -39,7 +42,12 @@ module Deploy
                      end
               destdir = FileOps.mkdir(state.abspath(item),mode)
               if opts and opts['recursive']
-                FileOps.copy_recursive(mkmaster_path.call(opts['source']),destdir)
+                src = if opts and opts['source']
+                        opts['source']
+                      else
+                        masterfiles
+                      end
+                FileOps.copy_recursive(mkmaster_path.call(src),destdir)
               end
             end
           when 'copy-file' then
