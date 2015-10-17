@@ -26,7 +26,6 @@ module Deploy
         source
       }
 
-
       list.each do | commands |
         commands.each do | command, items |
           p command
