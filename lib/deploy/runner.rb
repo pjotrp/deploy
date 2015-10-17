@@ -18,6 +18,7 @@ module Deploy
 
       # Now run the files in $rundir/config
       Dir.glob(rundir+'/config/*.yaml').each do | fn |
+        next if options[:module] and options[:module] != File.basename(fn,'.yaml')
         Command.exec(fn,rundir,state)
       end 
       state

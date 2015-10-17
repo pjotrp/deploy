@@ -35,6 +35,10 @@ options = {task: nil, show_help: false}
 opts = OptionParser.new do |o|
   o.banner = "Usage: #{File.basename($0)} command [options]\n"
 
+  o.on("--module m", String, "Run module only") do |s|
+    options[:module] = s
+  end
+
   o.on("-q", "--quiet", "Run quietly") do |q|
     options[:quiet] = true
   end

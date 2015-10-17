@@ -18,6 +18,12 @@ module Deploy
       FileUtils.copy_file(source,dest)
       dest
     end
+
+    def FileOps.copy_recursive(source,destdir)
+      # Using a system copy here because we don't want the added
+      # source directory
+      print `cp -vau #{source+'/*'} #{destdir}`
+    end
     
     def FileOps.chmod(item,mode)
       if mode.to_s(8) != (File.stat(item).mode).to_s(8)[-3..-1]

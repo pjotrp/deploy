@@ -8,7 +8,7 @@ module Deploy
     # it acts in a closure. So the last dir is shared in file.
     def Command.exec(fn,rundir,state)
 
-      print "Run "+fn+"\n"
+      print "Run "+File.basename(fn)+" configuration\n"
       list = YAML.load(File.read(fn))
       p list
       destdir = nil
@@ -36,6 +36,15 @@ module Deploy
         dest
       }
 
+      mkmaster_path = lambda { | name |
+        # source is a masterfile
+        source = name
+        if not File.exist?(source)
+          source = masterfiles+'/'+name
+        end
+        source
+      }
+
       copy_file = lambda { |item,opts| 
         p [item,opts]
         mode = 0644 # default
@@ -53,14 +62,10 @@ module Deploy
         end
         p [:destx,dest]
         p [:itemx,item]
-        # source is a masterfile
-        source = item
-        if not File.exist?(item)
-          source = masterfiles+'/'+item
-        end
-        newfn = FileOps.copy_file(source,dest)
+        newfn = FileOps.copy_file(mkmaster_path.call(item),dest)
         FileOps.chmod(newfn,mode)
       }
+
       
       list.each do | commands |
         commands.each do | command, items |
@@ -69,8 +74,11 @@ module Deploy
           when 'dir' then
             items.each do |item,opts|
               destdir = mkdir.call(item,opts)
+              if opts and opts['recursive']
+                FileOps.copy_recursive(mkmaster_path.call(opts['source']),destdir)
+              end
             end
-          when 'file' then
+          when 'copy-file' then
             items.each do |item,opts|
               copy_file.call(item,opts)
             end

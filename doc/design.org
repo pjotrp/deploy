@@ -312,7 +312,7 @@ class. The convention is to store such files in
       mode: "0755"
       user: "root"
       group: "root"
-- file:
+- file-copy:
     sshd_conf:
       mode: "0400"
 #+END_EXAMPLE
@@ -321,7 +321,7 @@ Actually the settings are defaults, so you can do
 
 #+BEGIN_EXAMPLE
 - dir: "/etc/ssh"
-- file:
+- file-copy:
     sshd_conf:
 #+END_EXAMPLE
 
@@ -336,39 +336,39 @@ An emacs configuration in $HOME could look like
 
 #+BEGIN_EXAMPLE
 ---
-- file:
+- file-copy:
     emacs:
       dest: .emacs
       mode: "400"
 - dir:
     .emacs.d:
     .emacs.d/lisp:
-- file:
+- file-copy:
     emacs.d/lisp/markdown-mode.el:
 - dir:
     .emacs.d/org:
-- file:
+- file-copy:
     emacs.d/org/ox-rss.el:
     emacs.d/org/toc-org.el:
 - dir:
     .emacs.d/themes:
-- file:
+- file-copy:
     emacs.d/themes/dark-blue-theme.el:
     emacs.d/themes/zenburn-theme.el:
 #+END_EXAMPLE
 
-but there is a simpler version. We can glob files with recursion this way
+but there is a simpler version. We can copy files with recursion this way
 
 #+BEGIN_EXAMPLE
 ---
-- file:
+- copy-file:
     emacs:
       dest: .emacs
       mode: "400"
 - dir:
     .emacs.d:
-- files:
-    emacs.d/**/*:
+      source: emacs.d
+      recursive: true
 #+END_EXAMPLE
 
 which copies the directory structure in masterfiles/emacs.d to
@@ -388,8 +388,8 @@ which copies the directory structure in masterfiles/emacs.d to
         └── zenburn-theme.el
 #+END_EXAMPLE
 
-The .emacs needs to be specified separately because it goes directly
-into $HOME.
+This greatly simplifies copying. The .emacs file, however, needs to be
+specified separately because it goes directly into $HOME.
 
 ** Edit files
 
@@ -423,7 +423,7 @@ guix:
 dir:
   - "/etc/vpnc"
     - mode: "0700"
-file:
+file-copy:
   - default.conf:
     - dest: "/etc/vpnc"
     - mode: "0400"
