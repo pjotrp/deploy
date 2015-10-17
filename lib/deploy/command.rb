@@ -26,26 +26,6 @@ module Deploy
         source
       }
 
-      copy_file = lambda { |item,opts| 
-        p [item,opts]
-        mode = 0644 # default
-        mode = opts['mode'].to_i(8) if opts and opts['mode']
-        dest =
-          if opts and opts['dest']
-            opts['dest']
-          else
-            destdir
-          end
-        # destination can be a file or directory
-        # if it is not absolute, make it relative to $HOME
-        if dest[0] != "/"
-          dest = state.homedir + '/' + dest
-        end
-        p [:destx,dest]
-        p [:itemx,item]
-        newfn = FileOps.copy_file(mkmaster_path.call(item),dest)
-        FileOps.chmod(newfn,mode)
-      }
 
       list.each do | commands |
         commands.each do | command, items |
@@ -65,7 +45,24 @@ module Deploy
             end
           when 'copy-file' then
             items.each do |item,opts|
-              copy_file.call(item,opts)
+              p [item,opts]
+              mode = 0644 # default
+              mode = opts['mode'].to_i(8) if opts and opts['mode']
+              dest =
+                if opts and opts['dest']
+                  opts['dest']
+                else
+                  destdir
+                end
+              # destination can be a file or directory
+              # if it is not absolute, make it relative to $HOME
+              if dest[0] != "/"
+                dest = state.homedir + '/' + dest
+              end
+              p [:destx,dest]
+              p [:itemx,item]
+              newfn = FileOps.copy_file(mkmaster_path.call(item),dest)
+              FileOps.chmod(newfn,mode)
             end
           else
             raise "UNKNOWN COMMAND "+command
