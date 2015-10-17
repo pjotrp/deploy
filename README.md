@@ -8,6 +8,9 @@ one of my last `large' software projects.  How these things come to
 haunt you! Cfruby is showing its age and now Deploy is bound to be a
 large project, again.
 
+More information can be found in the
+[design document](https://github.com/pjotrp/deploy/blob/master/doc/design.org).
+
 Early days for deploy, YMMV.
 
 Pjotr Prins (c) 2015
@@ -25,7 +28,8 @@ Deploy is developed in JIT fashion. First steps are:
 
 Sorry, initially, no transactions, parallelization, fancy error
 reporting etc. But it will come!  I have to start somewhere.  Call it
-agility ;)
+agility ;). At this stage I have started using deploy for machine
+management. Cfruby is being phased out.
 
 # License
 

@@ -102,10 +102,10 @@ thanks to GNU Guix there is no deployment issue there.
 
 ** Intermediate representation
 
-An intermediate representation of actions allows us to create
-views on that data. Also, for rolling back and deciding on 
-parallel execution, the intermediate representation comes in
-handy.
+An intermediate representation of actions allows us to create views on
+that data and checking of SHA values (i.e. changes to files). Also,
+for rolling back and deciding on parallel execution, the intermediate
+representation comes in handy.
 
 ** Transactions
 
@@ -177,7 +177,36 @@ for locking between different runs and roll-backs too.
 Output should be fine grained and easy to control. Too much output and
 people stop reading them. Output should be written to disk on
 completion of a module, collected at the end of a run and sorted by
-priority for display.
+priority for display. All messages can be filtered and set by
+individual module.
+
+Error levels should be:
+
+*** Fatal error
+
+Any error that breaks the install. 
+
+*** Error:  Non-fatal errors
+
+Normally halt module on Error, but it can be overridden by a command
+line switch. Transactions is rolled back. Other modules continue.
+
+*** Warning
+
+Just a warning.
+
+*** Debug 
+
+Debug information.
+
+*** Info
+
+General info. Within info we can have multiple levels, *each*
+one of which should be selectable or any combination thereof.
+
+1. Show actual actions taken, e.g. copying-file
+2. Show decision steps taken, e.g. compare SHA value
+3. Show general points of entry (e.g. copy-file).
 
 * Install GNU Guix, ruby, git and deploy
 
@@ -374,7 +403,7 @@ but there is a simpler version. We can copy files with recursion this way
 - copy-file:
     emacs:
       dest: .emacs
-      mode: "400"
+      mode: "0400"
 - dir:
     .emacs.d:
       source: emacs.d

@@ -6,23 +6,25 @@ module Deploy
   module FileOps
     
     def FileOps.copy_file(source,dest)
-      p ["copy_file",source,dest]
       if File.directory?(dest)
         dest = dest + '/' + File.basename(source)
       end
       # p File.stat(dest).mode.to_s(2)
       # p 0222.to_s(2)
-      if (File.exist?(dest) and (File.stat(dest).mode & 0222))
-        chmod(dest,0600)  # until we have checking in place, override mode for writing
+      if not Checksum.file_equal?(source,dest)
+        if (File.exist?(dest) and (File.stat(dest).mode & 0222))
+          chmod(dest,0600)  # until we have checking in place, override mode for writing
+        end
+        p ["copying file",source,dest]
+        FileUtils.copy_file(source,dest)
       end
-      FileUtils.copy_file(source,dest)
       dest
     end
 
     def FileOps.copy_recursive(source,destdir)
       # Using a system copy here because we don't want the added
       # source directory
-      print `cp -vuP #{source+'/*'} #{destdir}`
+      print `cp -urP #{source+'/*'} #{destdir}`
     end
     
     def FileOps.chmod(item,mode=0755)
