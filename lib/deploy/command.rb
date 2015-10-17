@@ -17,25 +17,6 @@ module Deploy
         masterfiles = rundir + '/masterfiles'
       end
 
-      mkdir = lambda { |item,opts|
-        p [item,opts]
-        mode = 0755 # default
-        mode = opts['mode'].to_i(8) if opts and opts['mode']
-        # if it is not absolute, make it relative to $HOME
-        dest = item
-        if dest[0] != '/'
-          dest = state.homedir + '/' + item
-        end
-        p ['mkdir?',dest]
-        if not File.directory?(dest)
-          p ["mkdir",dest,mode.to_s(8)]
-          Dir.mkdir(dest,mode)
-        else
-          FileOps.chmod(dest,mode)
-        end
-        dest
-      }
-
       mkmaster_path = lambda { | name |
         # source is a masterfile
         source = name
@@ -66,14 +47,18 @@ module Deploy
         FileOps.chmod(newfn,mode)
       }
 
-      
       list.each do | commands |
         commands.each do | command, items |
           p command
           case command 
           when 'dir' then
             items.each do |item,opts|
-              destdir = mkdir.call(item,opts)
+              mode = if opts and opts['mode']
+                       opts['mode'].to_i(8)
+                     else
+                       0755
+                     end
+              destdir = FileOps.mkdir(state.abspath(item),mode)
               if opts and opts['recursive']
                 FileOps.copy_recursive(mkmaster_path.call(opts['source']),destdir)
               end
@@ -81,27 +66,6 @@ module Deploy
           when 'copy-file' then
             items.each do |item,opts|
               copy_file.call(item,opts)
-            end
-          when 'files' then
-            items.each do |glob,opts|
-              p [glob,opts]
-              source = masterfiles
-              if opts and opts['source']
-                source = rundir + '/' + opts['source']
-              end
-              globbing = source + '/' + glob
-              p [:globbing,globbing]
-              Dir.glob(globbing) do |item|
-                p ['item',item]
-                dest = item[source.size+1..-1]
-                dest = destdir + '/' + dest
-                p ['dest',dest]
-                if File.directory?(item)
-                  destdir = mkdir.call(dest,opts)
-                else
-                  copy_file.call(item,opts)
-                end
-              end
             end
           else
             raise "UNKNOWN COMMAND "+command

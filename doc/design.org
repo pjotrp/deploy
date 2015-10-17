@@ -18,6 +18,8 @@
    - [[#modules][Modules]]
    - [[#config-files][Config files]]
    - [[#master-files][Master files]]
+   - [[#intermediate-format][Intermediate format]]
+ - [[#commands][Commands]]
    - [[#copy-files][Copy files]]
    - [[#edit-files][Edit files]]
  - [[#use-cases][Use cases]]
@@ -299,6 +301,14 @@ in the repository/config/*.yaml
 The convention for masterfiles is that they are relative to 
 repository/masterfiles/module/. If that module dir is missing the
 masterfiles are simply relative to repository/masterfiles/.
+
+** Intermediate format
+
+When the config files are parsed `deploy' won't run immediately.
+Instead it creates an intermediate representation with all the files
+and options expanded. These are reordered for later processing.
+
+* Commands
 
 ** Copy files
 

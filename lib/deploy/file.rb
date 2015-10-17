@@ -25,11 +25,24 @@ module Deploy
       print `cp -vau #{source+'/*'} #{destdir}`
     end
     
-    def FileOps.chmod(item,mode)
+    def FileOps.chmod(item,mode=0755)
+      p [item,mode.to_s(8)]
       if mode.to_s(8) != (File.stat(item).mode).to_s(8)[-3..-1]
         p ["chmod",mode.to_s(8)]
         File.chmod(mode,item)
       end
+    end
+
+    # Makes dir and returns the created directory
+    def FileOps.mkdir(dir,mode=0755)
+      p [dir,mode]
+      if not File.directory?(dir)
+        p ["mkdir",dir,mode.to_s(8)]
+        Dir.mkdir(dir,mode)
+      else
+        FileOps.chmod(dir,mode)
+      end
+      dir
     end
 
   end

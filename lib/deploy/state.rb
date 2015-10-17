@@ -12,6 +12,15 @@ module Deploy
       @username = Host.username()
       @homedir  = Host.homedir()
     end
+
+    # if it is not absolute, make it relative to $HOME
+    def abspath path
+      if path[0] != '/'
+        @homedir + '/' + path
+      else
+        path
+      end
+    end
     
   end
 end
