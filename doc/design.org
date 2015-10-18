@@ -107,6 +107,17 @@ that data and checking of SHA values (i.e. changes to files). Also,
 for rolling back and deciding on parallel execution, the intermediate
 representation comes in handy.
 
+The intermediate form is, in effect, the full-blown representation of
+the data tree that is written in YAML. So, if you copy a directory,
+the intermediate representation (a bag in Guix speak) contains all the
+files that are listed for copying, the modes, ownership and
+destination. Note it is an expansion only - the files in the bag are
+not compared for being different etc. That is a separate step.
+
+The idea is to separate expansion from checking and execution. Also
+the expanded list can be shown and studied, if required, without
+checking and execution, or with checking only.
+
 ** Transactions
 
 Transactions are surprisingly hard to achieve. The idea is to have
@@ -119,7 +130,9 @@ visible until the symlink changes. Rolling back is simply replacing a
 symlink (btw. the much older GNU Stow does something similar with
 symlinks).
 
-We will use GNU Guix for some stuff. So that is tactic one. 
+We will use GNU Guix for some stuff. So that is tactic one. Inside
+the reposititory there may be a ./guix directory containing 
+definitions.
 
 Tactic two is to use the same symlink idea, but to implement it
 ourselves.
@@ -260,38 +273,26 @@ First the server. In the fresh git repo we add a YAML file named
 to. E.g.
 
 #+BEGIN_EXAMPLE
-classes:
-  any:
-    - ssh
-    - guix
-machines:
-  myhost01:
-    - webserver
+ssh: any
+guix: any
+webserver: myhost01 myhost02
+firewall: webserver
 #+END_EXAMPLE
 
-Where myhost01 is a hostname or group of hosts.
+Where myhost01 is a hostname or group of hosts, a class in itself.  If
+you run deploy on myhost01 it will recognise the host belongs to
+classes webserver, firewall, guix and ssh (a simple expansion).
+
+Classes (effectively groupings) are important for registring
+functionality, but also for defining physical networks (DNS access)
+and giving different access to machines (hosts.allow).
 
 With Cfruby and cfengine classes were defined differently, but I like
 this approach because it clearly lists what a machine should be doing.
 Note: classes can be higher level abstractions and the host can also
 be 'any' so this git repository definition is relevant to all
-machines. So you can also write
-
-#+BEGIN_EXAMPLE
-groups:
-  git_webservers:
-    myhost01
-classes:
-  any:
-    - ssh
-    - guix
-  git_webservers:
-    - https
-    - git
-#+END_EXAMPLE
-
-So myhost01 is a member of the group git_webservers. These 
-webservers are part of ssy, guix, https, and git classes.
+machines. A class can contain machines (webserver) and other classes
+(firewall).
 
 To run this file simply point to the base directory or git repo, i.e.
 
@@ -475,3 +476,4 @@ appropriate permissions.
 A future version of `deploy' will actually create a versioned
 directory in /etc/deploy/vpnc/vpn-1/ and symlink to that to ascertain
 transactions and allow for roll-backs.
+

@@ -21,6 +21,7 @@ module Deploy
       dest
     end
 
+    # Fixme: copy_recursive should use SHA values
     def FileOps.copy_recursive(source,destdir)
       # Using a system copy here because we don't want the added
       # source directory
