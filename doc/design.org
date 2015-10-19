@@ -13,7 +13,6 @@
    - [[#fine-grained-output][Fine grained output]]
  - [[#install-gnu-guix-ruby-git-and-deploy][Install GNU Guix, ruby, git and deploy]]
  - [[#setting-up-a-deployment-definition][Setting up a deployment definition]]
-   - [[#machines][Machines]]
    - [[#classes][Classes]]
    - [[#modules][Modules]]
    - [[#config-files][Config files]]
@@ -102,11 +101,11 @@ thanks to GNU Guix there is no deployment issue there.
 
 ** Intermediate representation
 
-An intermediate representation of actions allows us to create views on
-that data and checking of SHA values (i.e. changes to files). Also,
-for rolling back and deciding on parallel execution, the intermediate
-representation comes in handy.
-
+An intermediate representation of actions, a `bag', allows us to
+create views on that data and checking of SHA values (i.e. changes to
+files). Also, for rolling back and deciding on parallel execution, the
+intermediate representation comes in handy.
+XS
 The intermediate form is, in effect, the full-blown representation of
 the data tree that is written in YAML. So, if you copy a directory,
 the intermediate representation (a bag in Guix speak) contains all the
@@ -158,6 +157,22 @@ previous state (somewhere) and write back the originals if the
 transaction does not complete.  Main problem is for disruptions to a
 running install, i.e., what happens in case of electricity failure?
 Maybe we should skip this option.
+
+Another point of consideration is checking for the final result.
+Actions in modules have to be ordered in such a way that the final
+result is the same (say when one module copies a clean file and
+a second module edits the file the first should not overwrite the
+second).
+
+*** Ordering
+
+In other words modules need to be ordered and their commands too.  The
+heuristic is to put mkdir first, followed by file copy, followed by
+file-edits. Modules working on the same paths should be in the same
+transaction. More than one mkdir is not allowed, nor more than one
+file copy. With file edits the actions are sorted by module name
+(unless an explicit dependency is defined) followed by occurance in
+the command file.
 
 ** Modules 
 
@@ -217,9 +232,10 @@ Debug information.
 General info. Within info we can have multiple levels, *each*
 one of which should be selectable or any combination thereof.
 
-1. Show actual actions taken, e.g. copying-file
-2. Show decision steps taken, e.g. compare SHA value
-3. Show general points of entry (e.g. copy-file).
+1. bag: show general points of entry (e.g. copy-file).
+2. compare: show decision steps taken, e.g. compare SHA value
+3. action: actual actions taken, e.g. copying-file
+4. skip: show unchanged - i.e. actions skipped
 
 * Install GNU Guix, ruby, git and deploy
 
@@ -266,7 +282,7 @@ definition. Here we are going to set up two examples, one for a server
 installation and one for a HOME directory. Unsurprisingly 
 I use both.
 
-** Machines
+** Classes
 
 First the server. In the fresh git repo we add a YAML file named
 'classes.yaml' that defines the host and the classes it belongs
@@ -300,12 +316,6 @@ To run this file simply point to the base directory or git repo, i.e.
 
 which will pick up the classes.yaml from ./serverrepo/ dir.
 
-** Classes
-
-Classes are simply groupings of functionality. These classes are
-referred to in modules, rather than hostnames (though that is possible
-too).
-
 ** Modules
 
 Modules are self contained (in principle independent) installation
@@ -335,8 +345,9 @@ masterfiles are simply relative to repository/masterfiles/.
 ** Intermediate format
 
 When the config files are parsed `deploy' won't run immediately.
-Instead it creates an intermediate representation with all the files
-and options expanded. These are reordered for later processing.
+Instead it creates an intermediate representation, a `bag', with all
+the files and options expanded. These are reordered for later
+processing.
 
 * Commands
 
@@ -365,10 +376,35 @@ Actually the settings are defaults, so you can do
     sshd_conf:
 #+END_EXAMPLE
 
-Note that the last dir gets picked up as a destination.
+Note that the last dir used gets picked up as a destination, this
+makes for the short notation.
 
 The Guile S-EXP version will be even more simple because we can remove
 the duplication. But that is for later.
+
+*** Classes
+
+Now say we don't want to install sshd on all servers - it is just an
+example.
+
+We define a class named sshd in classes.yaml containing myhost01:
+
+#+BEGIN_EXAMPLE
+sshd: myhost01
+#+END_EXAMPLE
+
+This means when running the ssh module on myhost01 we want it to 
+install, otherwise skip. Now the ssh.yaml should be something like
+
+#+BEGIN_EXAMPLE
+- class: sshd
+- dir: "/etc/ssh"
+- file-copy:
+    sshd_conf:
+#+END_EXAMPLE
+
+The class command basically says: honour the following commands until
+the next class command.
 
 *** Copy multiple files
 

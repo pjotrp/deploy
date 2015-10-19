@@ -1,6 +1,7 @@
 
 require 'deploy/state'
 require 'deploy/command'
+require 'deploy/execute'
 
 module Deploy
 
@@ -17,10 +18,13 @@ module Deploy
       end
 
       # Now run the files in $rundir/config
+      bags = []
       Dir.glob(rundir+'/config/*.yaml').each do | fn |
         next if options[:module] and options[:module] != File.basename(fn,'.yaml')
-        Command.exec(fn,rundir,state)
-      end 
+        bag = Command.exec(fn,rundir,state)
+        bags.push bag
+        Execute.bag bag
+      end
       state
     end
     

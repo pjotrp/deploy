@@ -24,7 +24,7 @@ Deploy is developed in JIT fashion. First steps are:
 3. Implement mkdir (done)
 4. Implement (recursive) file copy (done)
 5. Implement (simple) file edit
-6. Implement intermediate data format
+6. Implement intermediate data format (in progress)
 
 Sorry, initially, no transactions, parallelization, fancy error
 reporting etc. But it will come!  I have to start somewhere.  Call it

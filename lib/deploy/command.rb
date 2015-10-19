@@ -1,16 +1,23 @@
 require 'yaml'
+require 'deploy/bag'
 
 module Deploy
 
   module Command
 
-    # This is the exec function for one module (YAML file). Note that
-    # it acts in a closure. So the last dir is shared in file.
+    # This is the exec function for one module (YAML file). All
+    # actions are put into a bag. Note that it acts in a closure. So
+    # the last dir is shared in file.
+    #
+    # Returns a bag
+    
     def Command.exec(fn,rundir,state)
 
       print "Run "+File.basename(fn)+" configuration\n"
       list = YAML.load(File.read(fn))
       p list
+      bag = Bag.new(fn,state)
+
       destdir = nil
       masterfiles = rundir + '/masterfiles/' + File.basename(fn,'.yaml')
       if not File.directory?(masterfiles)
@@ -52,30 +59,14 @@ module Deploy
             end
           when 'copy-file' then
             items.each do |item,opts|
-              p [item,opts]
-              mode = 0644 # default
-              mode = opts['mode'].to_i(8) if opts and opts['mode']
-              dest =
-                if opts and opts['dest']
-                  opts['dest']
-                else
-                  destdir
-                end
-              # destination can be a file or directory
-              # if it is not absolute, make it relative to $HOME
-              if dest[0] != "/"
-                dest = state.homedir + '/' + dest
-              end
-              p [:destx,dest]
-              p [:itemx,item]
-              newfn = FileOps.copy_file(mkmaster_path.call(item),dest)
-              FileOps.chmod(newfn,mode)
+              bag.copy_file(mkmaster_path.call(item),opts)
             end
           else
             raise "UNKNOWN COMMAND "+command
           end
         end
       end
+      bag
     end
 
   end

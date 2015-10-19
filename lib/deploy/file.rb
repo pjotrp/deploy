@@ -17,6 +17,8 @@ module Deploy
         end
         p ["copying file",source,dest]
         FileUtils.copy_file(source,dest)
+      else
+        print "File #{dest} unchanged\n"
       end
       dest
     end
@@ -29,10 +31,11 @@ module Deploy
     end
     
     def FileOps.chmod(item,mode=0755)
-      p [item,mode.to_s(8)]
       if mode.to_s(8) != (File.stat(item).mode).to_s(8)[-3..-1]
         p ["chmod",mode.to_s(8)]
         File.chmod(mode,item)
+      else
+        print "Mode 0#{mode.to_s(8)} for #{item} unchanged"
       end
     end
 
