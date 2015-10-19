@@ -16,7 +16,6 @@ module Deploy
       print "Run "+File.basename(fn)+" configuration\n"
       list = YAML.load(File.read(fn))
       p list
-      bag = Bag.new(fn,state)
 
       destdir = nil
       masterfiles = rundir + '/masterfiles/' + File.basename(fn,'.yaml')
@@ -24,42 +23,18 @@ module Deploy
         masterfiles = rundir + '/masterfiles'
       end
 
-      mkmaster_path = lambda { | name |
-        # source is a masterfile
-        source = name
-        if not File.exist?(source)
-          source = masterfiles+'/'+name
-        end
-        if not File.exist?(source)
-          source = masterfiles
-        end
-        source
-      }
+      bag = Bag.new(fn,masterfiles,state)
 
       list.each do | commands |
         commands.each do | command, items |
-          p command
           case command 
           when 'dir' then
             items.each do |item,opts|
-              mode = if opts and opts['mode']
-                       opts['mode'].to_i(8)
-                     else
-                       0755
-                     end
-              destdir = FileOps.mkdir(state.abspath(item),mode)
-              if opts and opts['recursive']
-                src = if opts and opts['source']
-                        opts['source']
-                      else
-                        masterfiles
-                      end
-                FileOps.copy_recursive(mkmaster_path.call(src),destdir)
-              end
+              bag.dir(item,opts)
             end
           when 'copy-file' then
             items.each do |item,opts|
-              bag.copy_file(mkmaster_path.call(item),opts)
+              bag.copy_file(item,opts)
             end
           else
             raise "UNKNOWN COMMAND "+command

@@ -8,8 +8,16 @@ module Deploy
         case command
         when :copy_file then
           p [command,fn,opts]
-          newfn = FileOps.copy_file(fn,opts[:dest])
+          newfn = FileOps.copy_file(opts[:source],fn)
           FileOps.chmod(newfn,opts[:mode])
+        when :mkdir then
+          # destdir = FileOps.mkdir(fn,opts[:mode])
+        when :copy_recursive then
+          p item
+          # FileOps.copy_recursive(fn,opts[:source])
+        else
+          p item
+          raise "Uknown bag command #{command}!"
         end
       end
       bag
