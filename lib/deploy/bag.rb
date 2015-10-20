@@ -63,9 +63,13 @@ module Deploy
       if dest[0] != "/"
         dest = @state.homedir + '/' + dest
       end
+      if File.directory?(dest)
+        dest = dest + '/' + File.basename(item)
+      end
       nopts = {}
       nopts[:parameters] = opts
       nopts[:source] = mkmaster_path(item)
+      nopts[:dest] = dest
       nopts[:mode] = mode
       list.push [:copy_file,dest,nopts]
       list
@@ -83,9 +87,14 @@ module Deploy
       if dest[0] != "/"
         dest = @state.homedir + '/' + dest
       end
+      if File.directory?(dest)
+        dest = dest + '/' + File.basename(item)
+      end
       nopts = {}
       nopts[:parameters] = opts
       nopts[:source] = mkmaster_path(item)
+      nopts[:dest] = dest
+      nopts[:edit_lines] = opts['edit-lines']
       list.push [:edit_file,dest,nopts]
       list
     end        

@@ -14,7 +14,7 @@ module Deploy
         when :copy_file then
           FileOps.copy_file(opts[:source],dest)
         when :edit_file then
-          FileOps.edit_file(opts[:source],dest)
+          FileOps.edit_file(opts[:source],dest,opts[:edit_lines])
         else
           p item
           raise "Uknown bag command #{command}!"

@@ -4,11 +4,21 @@ require 'fileutils'
 
 module Deploy
   module FileOps
-    
-    def FileOps.copy_file(source,dest,mode=nil)
-      if File.directory?(dest)
-        dest = dest + '/' + File.basename(source)
+
+    # Makes dir and returns the created directory
+    def FileOps.mkdir(dir,mode=nil)
+      mode = 0555 if not mode      
+      if not File.directory?(dir)
+        p ["mkdir",dir,mode.to_s(8)]
+        Dir.mkdir(dir,mode)
+      else
+        print "Skip: Directory #{dir} already exists\n"
+        FileOps.chmod(dir,mode)
       end
+      dir
+    end
+
+    def FileOps.copy_file(source,dest,mode=nil)
       # p File.stat(dest).mode.to_s(2)
       # p 0222.to_s(2)
       if not Checksum.file_equal?(source,dest)
@@ -44,17 +54,23 @@ module Deploy
       end
     end
 
-    # Makes dir and returns the created directory
-    def FileOps.mkdir(dir,mode=nil)
-      mode = 0555 if not mode      
-      if not File.directory?(dir)
-        p ["mkdir",dir,mode.to_s(8)]
-        Dir.mkdir(dir,mode)
-      else
-        print "Skip: Directory #{dir} already exists\n"
-        FileOps.chmod(dir,mode)
+    def FileOps.edit_file(source,dest,edit_lines)
+      # For now edit file in place
+      buf = File.read(dest)
+      buf.each_line do | line |
+        edit_lines.each do | edit |
+          if edit['replace']
+            p "REPLACE"
+            next
+          end
+          # if edit['append-unique']
+          #   raise "HELL"
+          #   next
+          # end
+          p edit
+          raise "Uknown edit command"
+        end
       end
-      dir
     end
 
   end
