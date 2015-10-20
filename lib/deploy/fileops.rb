@@ -22,11 +22,10 @@ module Deploy
       # p File.stat(dest).mode.to_s(2)
       # p 0222.to_s(2)
       if not Checksum.file_equal?(source,dest)
-        if (File.exist?(dest) and (File.stat(dest).mode & 0222))
-          chmod(dest,0600)  # until we have checking in place, override mode for writing
-        end
-        p ["Action: copying file",source,dest]
-        FileUtils.copy_file(source,dest)
+        override_readonly(dest) {
+          p ["Action: copying file",source,dest]
+          FileUtils.copy_file(source,dest)
+        }
       else
         print "Skip: File #{dest} unchanged\n"
       end
@@ -43,7 +42,8 @@ module Deploy
       raise "Destination does not exist #{destdir}" if not File.directory?(destdir)
       print `cp -urP #{source+'/*'} #{destdir}`
     end
-    
+
+    # Returns the used mode
     def FileOps.chmod(item,mode=nil)
       mode = 0444 if not mode
       if mode.to_s(8) != (File.stat(item).mode).to_s(8)[-3..-1]
@@ -52,6 +52,7 @@ module Deploy
       else
         print "Skip: Mode 0#{mode.to_s(8)} for #{item} unchanged\n"
       end
+      mode
     end
 
     def FileOps.edit_file(source,dest,edit_lines)
@@ -91,10 +92,23 @@ module Deploy
         raise "Uknown edit command"
       end
       if oldbuf != nbuf
-        p nbuf
+        override_readonly(dest) { 
+          File.write(dest,nbuf.join("\n"))
+        }
       end
     end
-   
+
+    private
+    
+    def self.override_readonly fn, &block
+      mode = nil
+      if (File.exist?(fn) and (File.stat(fn).mode & 0400))
+        mode = File.stat(fn).mode
+        File.chmod(0600,fn)
+      end
+      block.call
+      File.chmod(mode,fn) if mode
+    end
   end
 end
 
