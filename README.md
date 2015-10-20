@@ -24,8 +24,8 @@ Deploy is developed in JIT fashion. First steps are:
 3. Implement mkdir (done)
 4. Implement (recursive) file copy (done)
 5. Implement intermediate data 'bag' format (done)
-6. Implement (simple) file edit (in progress)
-7. Expand recursive file copy and file permissions
+6. Implement (simple) file edit (done)
+7. Expand recursive file copy and file permissions (in progress)
 
 Sorry, initially, no transactions, parallelization, fancy error
 reporting etc. But it will come!  I have to start somewhere.  Call it
