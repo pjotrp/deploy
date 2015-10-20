@@ -105,7 +105,7 @@ An intermediate representation of actions, a `bag', allows us to
 create views on that data and checking of SHA values (i.e. changes to
 files). Also, for rolling back and deciding on parallel execution, the
 intermediate representation comes in handy.
-XS
+
 The intermediate form is, in effect, the full-blown representation of
 the data tree that is written in YAML. So, if you copy a directory,
 the intermediate representation (a bag in Guix speak) contains all the
@@ -312,7 +312,7 @@ machines. A class can contain machines (webserver) and other classes
 
 To run this file simply point to the base directory or git repo, i.e.
 
-: deploy run serverrepo
+: deploy serverrepo
 
 which will pick up the classes.yaml from ./serverrepo/ dir.
 
@@ -468,6 +468,28 @@ This greatly simplifies copying. The .emacs file, however, needs to be
 specified separately because it goes directly into $HOME.
 
 ** Edit files
+
+The most common edits are switching and/or appending configuration
+flags, e.g.
+
+#+BEGIN_EXAMPLE
+---
+- dir: "/etc/ssh"
+- edit-file:
+    sshd_conf:
+      - replace:        ^PasswordAuthentication \w+
+      - with:           PasswordAuthentication no
+      - append-unique:  AllowUsers user
+      - replace:        AllowUsers \w+
+      - with:           AllowUsers user
+#+END_EXAMPLE
+
+which are line edits replacing all occurances of password
+authentications and appending the allow users line if missing and edit
+it after. Note that we are using regular expressions for scanning.
+
+Note, btw, that we will introduce parametrization later so `user' can
+be fetched from outer scope settings.
 
 * Use cases
 

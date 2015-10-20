@@ -25,6 +25,7 @@ Deploy is developed in JIT fashion. First steps are:
 4. Implement (recursive) file copy (done)
 5. Implement intermediate data 'bag' format (done)
 6. Implement (simple) file edit
+7. Expand file copy
 
 Sorry, initially, no transactions, parallelization, fancy error
 reporting etc. But it will come!  I have to start somewhere.  Call it

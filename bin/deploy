@@ -6,12 +6,12 @@ Valid commands are 'run'
 
 Examples:
 
-  ./bin/deploy run test/data/simple
+  ./bin/deploy test/data/simple
 
 or
 
-  deploy run git://mygitrepos/myhomedir.git
-  deploy run git://mygitrepos/myservers.git
+  deploy git://mygitrepos/myhomedir.git
+  deploy git://mygitrepos/myservers.git
 
 Use --help for info
 """
@@ -33,7 +33,7 @@ require 'deploy'
 options = {task: nil, show_help: false}
             
 opts = OptionParser.new do |o|
-  o.banner = "Usage: #{File.basename($0)} command [options]\n"
+  o.banner = "Usage: #{File.basename($0)} [run|command] [options]\n"
 
   o.on("--module m", String, "Run module only") do |s|
     options[:module] = s
@@ -64,12 +64,12 @@ end
 begin
   opts.parse!(ARGV)
 
-  if ARGV.size > 0
+  if ARGV.size > 1
     options[:task] = ARGV.shift.to_sym
-  else
-    options[:show_help] = true
   end
-  
+
+  uri = ARGV.first
+
   $stderr.print "deploy #{version} (biogem Ruby #{RUBY_VERSION}) by Pjotr Prins 2014\n" if !options[:quiet]
 
   if options[:show_help]
@@ -86,7 +86,7 @@ end
 
 case options[:task] 
   when :run then
-    Deploy::Runner.run(options,ARGV.first)
+    Deploy::Runner.run(options,uri)
   else
-    raise "I do not know what to do!"
+    Deploy::Runner.run(options,uri)
 end

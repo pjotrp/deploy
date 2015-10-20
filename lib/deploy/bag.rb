@@ -21,28 +21,6 @@ module Deploy
         yield item
       end
     end
-    
-    def copy_file item,opts
-      mode = 0644 # default
-      mode = opts['mode'].to_i(8) if opts and opts['mode']
-      dest =
-        if opts and opts['dest']
-          opts['dest']
-        else
-          @destdir
-        end
-      # destination can be a file or directory
-      # if it is not absolute, make it relative to $HOME
-      if dest[0] != "/"
-        dest = @state.homedir + '/' + dest
-      end
-      nopts = {}
-      nopts[:parameters] = opts
-      nopts[:source] = mkmaster_path(item)
-      nopts[:mode] = mode
-      list.push [:copy_file,dest,nopts]
-      list
-    end        
 
     def dir item,opts
       mode = if opts and opts['mode']
@@ -70,6 +48,47 @@ module Deploy
       end
       list
     end
+
+    def copy_file item,opts
+      mode = 0644 # default
+      mode = opts['mode'].to_i(8) if opts and opts['mode']
+      dest =
+        if opts and opts['dest']
+          opts['dest']
+        else
+          @destdir
+        end
+      # destination can be a file or directory
+      # if it is not absolute, make it relative to $HOME
+      if dest[0] != "/"
+        dest = @state.homedir + '/' + dest
+      end
+      nopts = {}
+      nopts[:parameters] = opts
+      nopts[:source] = mkmaster_path(item)
+      nopts[:mode] = mode
+      list.push [:copy_file,dest,nopts]
+      list
+    end        
+
+    def edit_file item,opts
+      dest =
+        if opts and opts['dest']
+          opts['dest']
+        else
+          @destdir
+        end
+      # destination can be a file or directory
+      # if it is not absolute, make it relative to $HOME
+      if dest[0] != "/"
+        dest = @state.homedir + '/' + dest
+      end
+      nopts = {}
+      nopts[:parameters] = opts
+      nopts[:source] = mkmaster_path(item)
+      list.push [:edit_file,dest,nopts]
+      list
+    end        
 
     private
       

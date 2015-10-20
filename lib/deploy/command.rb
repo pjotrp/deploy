@@ -36,6 +36,10 @@ module Deploy
             items.each do |item,opts|
               bag.copy_file(item,opts)
             end
+          when 'edit-file' then
+            items.each do |item,opts|
+              bag.edit_file(item,opts)
+            end
           else
             raise "UNKNOWN COMMAND "+command
           end

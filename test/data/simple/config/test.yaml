@@ -1,6 +1,14 @@
 ---
 - dir:
     ".test_deploy":
-- file:
-    "test.conf":
+- copy-file:
+    test.conf:
       mode: "400"
+- edit-file:
+    test.conf:
+      edits:
+        - replace:        ^PasswordAuthentication \w+
+        - with:           PasswordAuthentication no
+        - append-unique:  AllowUsers user
+        - replace:        AllowUsers \w+
+        - with:           AllowUsers user

@@ -35,7 +35,7 @@ module Deploy
     
     def FileOps.chmod(item,mode=0755)
       if mode.to_s(8) != (File.stat(item).mode).to_s(8)[-3..-1]
-        print "Action: chmod #{itme} to ",mode.to_s(8),"\n"
+        print "Action: chmod #{item} to ",mode.to_s(8),"\n"
         File.chmod(mode,item)
       else
         print "Skip: Mode 0#{mode.to_s(8)} for #{item} unchanged\n"
