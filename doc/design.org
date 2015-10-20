@@ -474,14 +474,14 @@ flags, e.g.
 
 #+BEGIN_EXAMPLE
 ---
-- dir: "/etc/ssh"
 - edit-file:
     sshd_conf:
-      - replace:        ^PasswordAuthentication \w+
-      - with:           PasswordAuthentication no
-      - append-unique:  AllowUsers user
-      - replace:        AllowUsers \w+
-      - with:           AllowUsers user
+      edit-lines:
+        - replace:        ^PasswordAuthentication \w+
+        - with:           PasswordAuthentication no
+        - append-unique:  AllowUsers user
+        - replace:        AllowUsers \w+
+        - with:           AllowUsers user
 #+END_EXAMPLE
 
 which are line edits replacing all occurances of password

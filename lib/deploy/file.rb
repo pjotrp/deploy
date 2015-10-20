@@ -5,7 +5,7 @@ require 'fileutils'
 module Deploy
   module FileOps
     
-    def FileOps.copy_file(source,dest)
+    def FileOps.copy_file(source,dest,mode=nil)
       if File.directory?(dest)
         dest = dest + '/' + File.basename(source)
       end
@@ -20,6 +20,7 @@ module Deploy
       else
         print "Skip: File #{dest} unchanged\n"
       end
+      FileOps.chmod(dest,mode)
       dest
     end
 
@@ -33,7 +34,8 @@ module Deploy
       print `cp -urP #{source+'/*'} #{destdir}`
     end
     
-    def FileOps.chmod(item,mode=0755)
+    def FileOps.chmod(item,mode=nil)
+      mode = 0444 if not mode
       if mode.to_s(8) != (File.stat(item).mode).to_s(8)[-3..-1]
         print "Action: chmod #{item} to ",mode.to_s(8),"\n"
         File.chmod(mode,item)
@@ -43,7 +45,8 @@ module Deploy
     end
 
     # Makes dir and returns the created directory
-    def FileOps.mkdir(dir,mode=0755)
+    def FileOps.mkdir(dir,mode=nil)
+      mode = 0555 if not mode      
       if not File.directory?(dir)
         p ["mkdir",dir,mode.to_s(8)]
         Dir.mkdir(dir,mode)

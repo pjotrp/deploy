@@ -6,7 +6,7 @@
       mode: "400"
 - edit-file:
     test.conf:
-      edits:
+      edit-lines:
         - replace:        ^PasswordAuthentication \w+
         - with:           PasswordAuthentication no
         - append-unique:  AllowUsers user
