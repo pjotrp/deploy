@@ -56,7 +56,7 @@ module Deploy
 
     def FileOps.edit_file(source,dest,edit_lines)
       # For now edit file in place
-      nbuf = File.read(dest).split(/\n/)
+      oldbuf = nbuf = File.read(dest).split(/\n/)
       edit_lines.each do | edit |
         if edit['replace']
           regex = edit['replace']
@@ -90,7 +90,9 @@ module Deploy
         p edit
         raise "Uknown edit command"
       end
-      p nbuf
+      if oldbuf != nbuf
+        p nbuf
+      end
     end
    
   end
