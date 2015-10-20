@@ -8,11 +8,9 @@ module Deploy
         p [command,fn,opts]
         case command
         when :mkdir then
-          raise "HELL"
-          # destdir = FileOps.mkdir(fn,opts[:mode])
+          FileOps.mkdir(fn,opts[:mode])
         when :copy_recursive then
-          raise "HELL"
-          # FileOps.copy_recursive(fn,opts[:source])
+          FileOps.copy_recursive(opts[:source],fn)
         when :copy_file then
           newfn = FileOps.copy_file(opts[:source],fn)
           FileOps.chmod(newfn,opts[:mode])
