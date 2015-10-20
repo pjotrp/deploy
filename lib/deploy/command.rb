@@ -15,7 +15,6 @@ module Deploy
 
       print "Run "+File.basename(fn)+" configuration\n"
       list = YAML.load(File.read(fn))
-      p list
 
       destdir = nil
       masterfiles = rundir + '/masterfiles/' + File.basename(fn,'.yaml')

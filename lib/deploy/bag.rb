@@ -99,6 +99,14 @@ module Deploy
       list
     end        
 
+    def to_s
+      buf = ''
+      list.each do |item|
+        buf += item.to_yaml
+      end
+      buf
+    end
+    
     private
       
     def mkmaster_path(name)

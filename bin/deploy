@@ -2,7 +2,10 @@
 #
 
 USAGE = """
-Valid commands are 'run'
+Valid commands are 'run' and 'bag'
+
+  run    Runs the command files
+  bag    show the intermediate data types
 
 Examples:
 
@@ -13,6 +16,10 @@ or
   deploy git://mygitrepos/myhomedir.git
   deploy git://mygitrepos/myservers.git
 
+To see the intermediate structure use
+
+  ./bin/deploy bag test/data/simple
+  
 Use --help for info
 """
 
@@ -33,7 +40,7 @@ require 'deploy'
 options = {task: nil, show_help: false}
             
 opts = OptionParser.new do |o|
-  o.banner = "Usage: #{File.basename($0)} [run|command] [options]\n"
+  o.banner = "Usage: #{File.basename($0)} [run|bag] [options]\n"
 
   o.on("--module m", String, "Run module only") do |s|
     options[:module] = s
@@ -87,6 +94,13 @@ end
 case options[:task] 
   when :run then
     Deploy::Runner.run(options,uri)
+  when :bag then
+    Deploy::Runner.run(options,uri,do_show_bag: true, do_execute: false)    
   else
-    Deploy::Runner.run(options,uri)
+    if uri
+      Deploy::Runner.run(options,uri)
+    else
+      print opts
+      # print USAGE
+    end
 end
