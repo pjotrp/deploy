@@ -7,9 +7,10 @@
 - edit-file:
     test.conf:
       edit-lines:
-        - replace:        ^PasswordAuthentication \w+
+        - replace:        /^PasswordAuthentication \w+/
           with:           PasswordAuthentication no
         - append-unique:  AllowUsers user
-        - replace:        AllowUsers \w+
+        - replace:        /AllowUsers \w+/
           with:           AllowUsers user
+        - append-unique:  Should be there
         

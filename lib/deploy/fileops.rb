@@ -56,23 +56,43 @@ module Deploy
 
     def FileOps.edit_file(source,dest,edit_lines)
       # For now edit file in place
-      buf = File.read(dest)
-      buf.each_line do | line |
-        edit_lines.each do | edit |
-          if edit['replace']
-            p "REPLACE"
-            next
-          end
-          # if edit['append-unique']
-          #   raise "HELL"
-          #   next
-          # end
-          p edit
-          raise "Uknown edit command"
+      nbuf = File.read(dest).split(/\n/)
+      edit_lines.each do | edit |
+        if edit['replace']
+          regex = edit['replace']
+          with = edit['with']
+          # print "#{regex}\n"
+          nbuf = nbuf.map { | line |
+            if eval("line =~ #{regex}")
+              p [:replace,line,with]
+              with
+            else
+              line
+            end
+          }
+          next
         end
+        if edit['append-unique']
+          append = edit['append-unique']
+          found = false
+          nbuf.each do | line |
+            if line == append
+              found = true
+              break
+            end
+          end
+          if not found
+            p [:append,append]
+            nbuf << append
+          end
+          next
+        end
+        p edit
+        raise "Uknown edit command"
       end
+      p nbuf
     end
-
+   
   end
 end
 
