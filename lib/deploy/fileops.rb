@@ -7,7 +7,7 @@ module Deploy
 
     # Makes dir and returns the created directory
     def FileOps.mkdir(dir,mode=nil)
-      mode = 0555 if not mode      
+      mode = 0555 if not mode
       if not File.directory?(dir)
         p ["mkdir",dir,mode.to_s(8)]
         Dir.mkdir(dir,mode)
@@ -45,7 +45,7 @@ module Deploy
 
     # Returns the used mode
     def FileOps.chmod(item,mode=nil)
-      mode = 0444 if not mode
+      mode = 0444 if not mode # default
       if mode.to_s(8) != (File.stat(item).mode).to_s(8)[-3..-1]
         print "Action: chmod #{item} to ",mode.to_s(8),"\n"
         File.chmod(mode,item)
@@ -92,14 +92,14 @@ module Deploy
         raise "Uknown edit command"
       end
       if oldbuf != nbuf
-        override_readonly(dest) { 
+        override_readonly(dest) {
           File.write(dest,nbuf.join("\n"))
         }
       end
     end
 
     private
-    
+
     def self.override_readonly fn, &block
       mode = nil
       if (File.exist?(fn) and (File.stat(fn).mode & 0400))
@@ -111,4 +111,3 @@ module Deploy
     end
   end
 end
-

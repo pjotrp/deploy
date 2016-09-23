@@ -10,7 +10,7 @@ module Deploy
     # the last dir is shared in file.
     #
     # Returns a bag
-    
+
     def Command.exec(fn,rundir,state)
 
       print "Run "+File.basename(fn)+" configuration\n"
@@ -26,7 +26,7 @@ module Deploy
 
       list.each do | commands |
         commands.each do | command, items |
-          case command 
+          case command
           when 'dir' then
             items.each do |item,opts|
               bag.dir(item,opts)
