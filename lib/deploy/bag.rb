@@ -68,12 +68,19 @@ module Deploy
       end
       nopts = {}
       nopts[:parameters] = opts
-      nopts[:source] = mkmaster_path(item)
+
+      source = mkmaster_path(item)
+      host_specific_source = source + "." + @state.hostname
+      if File.exist?(host_specific_source)
+        source = host_specific_source
+      end
+      print source
+      nopts[:source] = source
       nopts[:dest] = dest
       nopts[:mode] = mode
       list.push [:copy_file,dest,nopts]
       list
-    end        
+    end
 
     def edit_file item,opts
       dest =
@@ -97,7 +104,7 @@ module Deploy
       nopts[:edit_lines] = opts['edit-lines']
       list.push [:edit_file,dest,nopts]
       list
-    end        
+    end
 
     def to_s
       buf = ''
@@ -106,9 +113,9 @@ module Deploy
       end
       buf
     end
-    
+
     private
-      
+
     def mkmaster_path(name)
       # source is a masterfile
       source = name
