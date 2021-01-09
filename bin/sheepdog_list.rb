@@ -48,7 +48,11 @@ r.smembers(channel).each do | buf |
         else
           e.command
         end
-  print("#{e.time} (#{e.host}) #{e.err} #{e.status} #{tag}")
+  if e.elapsed
+    min = sprintf("%.2d",e.elapsed/60)
+    sec = sprintf("%.2d",e.elapsed % 60)
+  end
+  print("#{e.time} (#{e.host}) #{e.err} #{e.status} <#{min}m#{sec}s> #{tag}")
   print("\n")
 end
 puts("For more info try: redis-cli  Smembers sheepdog:run")
