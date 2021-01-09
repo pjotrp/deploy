@@ -42,7 +42,22 @@ is not host bound and easy to query.
 
     ./bin/sheepdog_run.rb -v -c 'echo "HELLO WORLD"'
 
-We host a reference implementation here.
+We host a reference implementation here. Sheepdog has a number
+of tricks:
+
+## Find if a directory changed
+
+When doing backups we want to know (1) whether a command ran,
+(2) whether it failed and (3) assert something happened.
+For the (3) Unix has
+
+    find dir/ -iname "*" -mtime -2 -print
+
+to see if anything changed in the last days. Sheepdog can do
+
+    sheepdog_run.rb -v -c 'find . -iname "*" -mtime -2 -print|grep bin'
+
+where `grep` generates a return value.
 
 # Install
 

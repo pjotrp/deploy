@@ -42,7 +42,11 @@ end
 channel = "sheepdog:"+opts.channel
 
 r.smembers(channel).each do | buf |
-  e = OpenStruct.new(eval(buf))
+  begin
+    e = OpenStruct.new(JSON::parse(buf))
+  rescue JSON::ParserError
+    next
+  end
   tag = if e.tag
           e.tag
         else

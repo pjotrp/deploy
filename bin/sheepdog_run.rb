@@ -11,6 +11,7 @@
 #
 # or use sheepdog_list.rb
 
+require 'json'
 require 'open3'
 require 'optparse'
 require 'ostruct'
@@ -94,18 +95,17 @@ event = {
 
 id = channel
 
-p id,event if verbose
-
 if errval != 0
-  if verbose
-    puts(stderr)
-    puts("Pushing out an event (sheepdog)\n")
-  end
   event[:err] = "FAIL"
-  r.sadd(id,event)
+  if verbose
+    puts(event)
+    puts("Pushing out an event (#{id})\n")
+  end
+  json = event.to_json
+  r.sadd(id,json)
   if opts.log
-    File.open(opts.log,"a") { |f| f.print(event,"\n") }
+    File.open(opts.log,"a") { |f| f.print(json,",\n") }
   end
 else
-  puts("No event to report (sheepdog)") if verbose
+  puts("No event to report (#{id})") if verbose
 end
