@@ -35,6 +35,9 @@ OptionParser.new do |opts|
   opts.on("-c", "--cmd full", "Run command") do |cmd|
     options[:cmd] = cmd
   end
+  opts.on("--always", "Always report SUCC or FAIL") do |always|
+    options[:always] = always
+  end
   opts.on("-p", "--port num", Integer, "Run local redis on port") do |port|
     options[:port] = port
   end
@@ -97,6 +100,11 @@ id = channel
 
 if errval != 0
   event[:err] = "FAIL"
+else
+  event[:err] = "SUCC"
+end
+
+if opts.always or errval != 0
   if verbose
     puts(event)
     puts("Pushing out an event (#{id})\n")
