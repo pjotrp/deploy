@@ -66,7 +66,10 @@ Outputs a nicely colored and formatted:
 }
 ```
 
-Check jq out. It has a lot of powerful filters.
+Check jq out. It has a lot of powerful filters. To get the
+last status of services do
+
+    ./bin/sheepdog_list.rb --status|jq
 
 We host a reference implementation here. Sheepdog has a number
 of tricks:
@@ -89,7 +92,7 @@ where `grep` generates a return value.
 
 To install dependencies:
 
-    env GUIX_PACKAGE_PATH=~/iwrk/opensource/guix/guix-bioinformatics/ ~/.config/guix/current/bin/guix package -i ruby ruby-redis redis -p ~/opt/deploy
+    env GUIX_PACKAGE_PATH=~/iwrk/opensource/guix/guix-bioinformatics/ ~/.config/guix/current/bin/guix package -i ruby ruby-redis redis jq -p ~/opt/deploy
 
 Setup the environment
 

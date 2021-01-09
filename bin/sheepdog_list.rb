@@ -25,6 +25,9 @@ OptionParser.new do |opts|
   opts.on("--[no-]json", "Output valid JSON") do |json|
     options[:json] = json
   end
+  opts.on("--status", "Output status") do |status|
+    options[:status] = status
+  end
   opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
     options[:verbose] = v
   end
@@ -45,6 +48,8 @@ end
 
 channel = "sheepdog:"+opts.channel
 
+status = {}
+
 print("[") if opts.json
 r.smembers(channel).sort.each_with_index do | buf,i |
   begin
@@ -58,6 +63,7 @@ r.smembers(channel).sort.each_with_index do | buf,i |
         else
           e.command
         end
+  status[tag] = e.err
   if e.elapsed
     min = sprintf("%.2d",e.elapsed/60)
     sec = sprintf("%.2d",e.elapsed % 60)
@@ -65,6 +71,8 @@ r.smembers(channel).sort.each_with_index do | buf,i |
   if opts.json
     print(",") if i>0
     print(buf)
+  elsif opts.status
+    # skip
   else
     print("#{e.time} (#{e.host}) #{e.err} #{e.status} <#{min}m#{sec}s> #{tag}")
     print("\n")
@@ -74,4 +82,8 @@ if opts.json
   print("]")
 else
   puts("For more info try: redis-cli  Smembers sheepdog:run") if verbose
+end
+
+if opts.status
+  print(status.to_json)
 end
