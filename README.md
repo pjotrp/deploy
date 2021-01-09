@@ -32,6 +32,18 @@ reporting etc. Use GNU Guix properly for doing deployment right! At
 this stage I have started using deploy for machine management. Cfruby
 is being phased out.
 
+# Sheepdog
+
+Sheepdog is a tool for monitoring services. The idea is simple: use a
+wrapper script to capture output of, for example, a backup run. On
+error push a message out into a queue. By default we use redis, but
+syslog and others may also be used. The advantage of redis is that it
+is not host bound and easy to query.
+
+    ./bin/sheepdog_run.rb -v -c 'echo "HELLO WORLD"'
+
+We host a reference implementation here.
+
 # License
 
 This software is published under the MIT license.
