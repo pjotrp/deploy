@@ -74,7 +74,6 @@ module Deploy
       if File.exist?(host_specific_source)
         source = host_specific_source
       end
-      print source
       nopts[:source] = source
       nopts[:dest] = dest
       nopts[:mode] = mode

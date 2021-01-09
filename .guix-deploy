@@ -1,0 +1,1 @@
+env GUIX_PACKAGE_PATH=~/iwrk/opensource/guix/guix-bioinformatics/ ~/.config/guix/current/bin/guix environment --pure --ad-hoc ruby ruby-redis redis

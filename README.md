@@ -13,7 +13,7 @@ More information can be found in the
 
 Early days for deploy, YMMV.
 
-Pjotr Prins (c) 2015
+Pjotr Prins (c) 2015-2021
 
 # Implementation (JIT)
 
@@ -28,9 +28,9 @@ Deploy is developed in JIT fashion. First steps are:
 7. Expand recursive file copy and file permissions (in progress)
 
 Sorry, initially, no transactions, parallelization, fancy error
-reporting etc. But it will come!  I have to start somewhere.  Call it
-agility ;). At this stage I have started using deploy for machine
-management. Cfruby is being phased out.
+reporting etc. Use GNU Guix properly for doing deployment right! At
+this stage I have started using deploy for machine management. Cfruby
+is being phased out.
 
 # License
 
