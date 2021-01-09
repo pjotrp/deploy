@@ -40,6 +40,10 @@ OptionParser.new do |opts|
   opts.on("-t", "--tag tag", "Set message tag") do |tag|
     options[:tag] = tag
   end
+  opts.on("--log [file]", "Also log output to file (default sheepdog.log)") do |log|
+    log = "sheepdog.log" if not log
+    options[:log] = log
+  end
   opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
     options[:verbose] = v
   end
@@ -93,6 +97,9 @@ if errval != 0
   end
   event[:err] = "FAIL"
   r.sadd(id,event)
+  if opts.log
+    File.open(opts.log,"a") { |f| f.print(event,"\n") }
+  end
 else
   puts("No event to report (sheepdog)") if verbose
 end
