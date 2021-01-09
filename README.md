@@ -42,6 +42,32 @@ is not host bound and easy to query.
 
     ./bin/sheepdog_run.rb -v -c 'echo "HELLO WORLD"'
 
+To get the status, query with
+
+    ./bin/sheepdog_list.rb
+
+And parse JSON with the great `jq` tool you can find [here](https://stedolan.github.io/jq/):
+
+    ./bin/sheepdog_list.rb --json|jq
+
+Outputs a nicely colored and formatted:
+
+```js
+{
+    "time": "2021-01-09 16:00:34 +0000",
+    "elapsed": 0,
+    "host": "lario",
+    "command": "find . -iname \"*\" -mtime -100 -print|grep binx",
+    "tag": "HELLO",
+    "stdout": "",
+    "stderr": "",
+    "status": 1,
+    "err": "FAIL"
+}
+```
+
+Check jq out. It has a lot of powerful filters.
+
 We host a reference implementation here. Sheepdog has a number
 of tricks:
 

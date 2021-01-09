@@ -1,6 +1,6 @@
 #! /usr/bin/env ruby
 #
-# sheepdog_list prints the queueu
+# sheepdog_list prints the queue
 #
 
 require 'json'
@@ -22,13 +22,17 @@ OptionParser.new do |opts|
   opts.on("-c", "--cmd full", "Run command") do |cmd|
     options[:cmd] = cmd
   end
+  opts.on("--[no-]json", "Output valid JSON") do |json|
+    options[:json] = json
+  end
   opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
     options[:verbose] = v
   end
 
 end.parse!
 
-p options if options[:verbose]
+verbose = options[:verbose]
+p options if verbose
 
 opts = OpenStruct.new(options)
 
@@ -41,9 +45,11 @@ end
 
 channel = "sheepdog:"+opts.channel
 
-r.smembers(channel).each do | buf |
+print("[") if opts.json
+r.smembers(channel).sort.each_with_index do | buf,i |
   begin
-    e = OpenStruct.new(JSON::parse(buf))
+    json = JSON::parse(buf)
+    e = OpenStruct.new(json)
   rescue JSON::ParserError
     next
   end
@@ -56,7 +62,16 @@ r.smembers(channel).each do | buf |
     min = sprintf("%.2d",e.elapsed/60)
     sec = sprintf("%.2d",e.elapsed % 60)
   end
-  print("#{e.time} (#{e.host}) #{e.err} #{e.status} <#{min}m#{sec}s> #{tag}")
-  print("\n")
+  if opts.json
+    print(",") if i>0
+    print(buf)
+  else
+    print("#{e.time} (#{e.host}) #{e.err} #{e.status} <#{min}m#{sec}s> #{tag}")
+    print("\n")
+  end
 end
-puts("For more info try: redis-cli  Smembers sheepdog:run")
+if opts.json
+  print("]")
+else
+  puts("For more info try: redis-cli  Smembers sheepdog:run") if verbose
+end
