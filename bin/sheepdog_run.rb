@@ -18,7 +18,7 @@ require 'redis'
 require 'socket'
 
 def error(msg)
-  $stderr.print("ERROR: "+msg+" (sheepdog)\n")
+  print("ERROR: "+msg+" (sheepdog)\n")
   exit(1)
 end
 
