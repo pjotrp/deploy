@@ -101,7 +101,7 @@ id = channel
 if errval != 0
   event[:err] = "FAIL"
 else
-  event[:err] = "SUCC"
+  event[:err] = "SUCCESS"
 end
 
 if opts.always or errval != 0
