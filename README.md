@@ -62,18 +62,25 @@ environment variables. The following may just do in CRON:
 A (failing) CRON job may look like
 
     0 * * * * echo $HOME >> ~/sheepdog.log
-    0 * * * * GEM_PATH=$HOME/opt/deploy/lib/ruby/vendor_ruby ~/iwrk/deploy/deploy/bin/sheepdog_run.rb -c 'nono "HELLO WORLD"' --tag HELLO >> ~/sheepdog.log &2>1
+    0 * * * * GEM_PATH=$HOME/opt/deploy/lib/ruby/vendor_ruby ~/iuser/deploy/deploy/bin/sheepdog_run.rb -c 'nono "HELLO WORLD"' --tag HELLO >> ~/sheepdog.log &2>1
 
 GEM_PATH can also be set at the top of the crontab, but note that does no
 variable expansion of $HOME. Something like this may work
 
-    GEM_PATH=/home/wrk/opt/deploy/lib/ruby/vendor_ruby
-    PATH=/home/wrk/iwrk/deploy/deploy/bin:/home/wrk/opt/deploy/bin:/bin:/usr/bin
+    GEM_PATH=/home/user/opt/deploy/lib/ruby/vendor_ruby
+    PATH=/home/user/iuser/deploy/deploy/bin:/home/user/opt/deploy/bin:/bin:/usr/bin
 
     0 * * * * sheepdog_run.rb -c 'echo "HELLO WORLD"' --tag HELLO -v >> ~/sheepdog.log
 
 Do test with the -v switch and '>> log' to make sure your script works.
+Thereafter
 
+    GEM_PATH=/home/user/opt/deploy/lib/ruby/vendor_ruby
+    PATH=/home/user/iuser/deploy/deploy/bin:/home/user/opt/deploy/bin:/bin:/usr/bin
+
+    0 * * * * sheepdog_run.rb -c 'echo "HELLO WORLD"' --tag HELLO -v --log
+
+should do the job.
 
 # License
 
