@@ -76,8 +76,6 @@ if CONFIG and opts.host and not redis_password
   redis_password = CONFIG[opts.host]['password']
 end
 
-p redis_password
-
 r = Redis.new(host: opts.host, port: opts.port, password: redis_password)
 begin
   r.ping()
