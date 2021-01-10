@@ -23,6 +23,13 @@ def error(msg)
   exit(1)
 end
 
+# Read options file
+CONFIGFN = ENV['HOME']+"/.redis.conf"
+if File.exist?(CONFIGFN)
+  CONFIG = JSON.parse(File.read(ENV['HOME']+"/.redis.conf"))
+end
+
+redis_password = nil
 options = {
   cmd: 'echo "Hello world"',
   channel: 'run',
@@ -38,8 +45,14 @@ OptionParser.new do |opts|
   opts.on("--always", "Always report SUCC or FAIL") do |always|
     options[:always] = always
   end
-  opts.on("-p", "--port num", Integer, "Run local redis on port") do |port|
+  opts.on("-h", "--host name", "Attach to redis on host") do |host|
+    options[:host] = host
+  end
+  opts.on("-p", "--port num", Integer, "Attach to redis on port") do |port|
     options[:port] = port
+  end
+  opts.on("--password str", "Attach to redis with password") do |pwd|
+    redis_password = pwd
   end
   opts.on("-t", "--tag tag", "Set message tag") do |tag|
     options[:tag] = tag
@@ -59,11 +72,19 @@ p options if verbose
 
 opts = OpenStruct.new(options)
 
-r = Redis.new(host: opts.host, port: opts.port)
+if CONFIG and opts.host and not redis_password
+  redis_password = CONFIG[opts.host]['password']
+end
+
+p redis_password
+
+r = Redis.new(host: opts.host, port: opts.port, password: redis_password)
 begin
-  r.get("just testing@")
+  r.ping()
 rescue Redis::CannotConnectError
   error("redis is not connecting")
+rescue  Redis::CommandError
+  error("redis password error")
 end
 channel = "sheepdog:"+opts.channel
 

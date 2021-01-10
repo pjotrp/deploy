@@ -45,6 +45,11 @@ is not host bound and easy to query.
 To get the status, query with
 
     ./bin/sheepdog_list.rb
+    2021-01-10 00:33:41 -0600 (penguin2) SUCCESS 0 <33m40s> TRIM
+    2021-01-10 01:00:01 -0600 (penguin2) FAIL 1 <00m00s> CHK_BORG_GN2
+    2021-01-10 01:00:01 -0600 (penguin2) SUCCESS 0 <00m00s> CHK_BORG_IPFS
+    2021-01-10 01:00:01 -0600 (penguin2) SUCCESS 0 <00m00s> CHK_BORG_TUX01
+    2021-01-10 01:00:01 -0600 (penguin2) SUCCESS 0 <00m00s> CHK_TUX01_MARIADB
 
 And parse JSON with the great `jq` tool you can find [here](https://stedolan.github.io/jq/):
 
@@ -78,6 +83,7 @@ of tricks:
 
 When doing backups we want to know (1) whether a command ran,
 (2) whether it failed and (3) assert something happened.
+
 For the (3) Unix has
 
     find dir/ -iname "*" -mtime -2 -print
@@ -87,6 +93,33 @@ to see if anything changed in the last days. Sheepdog can do
     sheepdog_run.rb -v -c 'find . -iname "*" -mtime -2 -print|grep bin'
 
 where `grep` generates a return value.
+
+# Redis
+
+Because we use redis we can use the following commands:
+
+## Remove messages
+
+```
+redis-cli
+KEYS sheepdog:*
+DEL sheepdog:run
+```
+
+## Using passwords
+
+When a server is configured with a password it can be passed on
+the command line with `--password` or set in a file `~/.redis-pass`:
+
+```js
+{
+  "hostname": {
+     "password": "****"
+  }
+}
+```
+
+Multiple hosts are supported.
 
 # Install
 
