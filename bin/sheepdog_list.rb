@@ -87,7 +87,7 @@ r.smembers(channel).sort.each_with_index do | buf,i |
         else
           e.command
         end
-  status[tag] = {time: e.time, status: e.err}
+  status[tag] = {time: e.time, host: e.host, status: e.err}
   if e.elapsed
     min = sprintf("%.2d",e.elapsed/60)
     sec = sprintf("%.2d",e.elapsed % 60)
@@ -109,5 +109,11 @@ else
 end
 
 if opts.status
-  print(status.to_json)
+  list = []
+  status.each_pair { |e|
+    k,v = e
+    v['tag'] = k
+    list.push(v)
+  }
+  print(list.to_json)
 end

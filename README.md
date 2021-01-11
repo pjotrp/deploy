@@ -79,6 +79,33 @@ last status of services do
 We host a reference implementation here. Sheepdog has a number
 of tricks:
 
+## jq for filtered output
+
+Reduce the number of fields:
+
+    sheepdog_list.rb --status|jq '.[]| { time: .time, tag: .tag, status: .status }'
+
+To see only the failing tags (-c outputs a record on a single line):
+
+    sheepdog_list.rb --status|jq -c '.[]| select(.status=="FAIL") | { time: .time, tag: .tag, status: .status }'
+
+```js
+{"time":"2021-01-10 09:42:46 +0100","tag":"FETCH_P2","status":"FAIL"}
+{"time":"2021-01-11 02:00:02 -0600","tag":"CHK_BORG_GN2","status":"FAIL"}
+```
+
+## Backups
+
+An example for making a backup with the excellent borg tool, reporting
+to a redis server running on a host named report.lan
+
+```sh
+#!/bin/bash
+
+export stamp=$(date +%A-%Y%m%d-%H:%M:%S)
+sheepdog_run.rb -c "borg create /export/backup/borg-etc::P2_etc-$stamp /etc" --tag 'P2-ETC' --log --always --host report.lan
+```
+
 ## Find if a directory changed
 
 When doing backups we want to know (1) whether a command ran,
