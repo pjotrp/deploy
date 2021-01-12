@@ -58,7 +58,9 @@ p options if verbose
 opts = OpenStruct.new(options)
 
 if CONFIG and opts.host and not redis_password
-  redis_password = CONFIG[opts.host]['password']
+  if CONFIG.has_key?(opts.host)
+    redis_password = CONFIG[opts.host]['password']
+  end
 end
 
 r = Redis.new(host: opts.host, port: opts.port, password: redis_password)

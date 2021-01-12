@@ -36,9 +36,14 @@ is being phased out.
 
 Sheepdog is a tool for monitoring services. The idea is simple: use a
 wrapper script to capture output of, for example, a backup run. On
-error push a message out into a queue. By default we use redis, but
-syslog and others may also be used. The advantage of redis is that it
-is not host bound and easy to query.
+error push a message out into a queue. The basic premises are:
+
+- Only notify on FAIL
+- Separation of concerns
+- Make debugging of scripts easy
+
+By default we use redis, but syslog and others may also be used. The
+advantage of redis is that it is not host bound and easy to query.
 
     ./bin/sheepdog_run.rb -v -c 'echo "HELLO WORLD"'
 
@@ -121,6 +126,20 @@ to see if anything changed in the last days. Sheepdog can do
 
 where `grep` generates a return value.
 
+## Monitor the monitor
+
+Ok, you have a notification for your backup job. How do you know when
+the server just stopped working? There are three things to add: a ping
+or curl job to the machine (see above), and monitoring job output,
+e.g. with above 'find if a directory changed'. In addition you can
+monitor for failig redis PINGs by adding a daily ping to redis with
+
+    sheepdog_ping.rb --host redishost
+
+and adding an 'expect' job to notify you if such a PING is not received
+in time.
+
+
 # Redis
 
 Because we use redis we can use the following commands:
@@ -147,6 +166,18 @@ the command line with `--password` or set in a file `~/.redis-pass`:
 ```
 
 Multiple hosts are supported.
+
+# Developing a new notification service
+
+To create a new notification service it is easiest to go through
+the following steps:
+
+1. Create notification with `-v` and '`--always` flags
+2. Run notification every minute (in CRON)
+3. After making sure it works relax (1) and (2).
+
+The notifications contain stdout and stderr output which should be
+informative.
 
 # Install
 
