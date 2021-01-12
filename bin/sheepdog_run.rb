@@ -75,7 +75,9 @@ p options if verbose
 opts = OpenStruct.new(options)
 
 if CONFIG and opts.host and not redis_password
-  redis_password = CONFIG[opts.host]['password']
+  if CONFIG.has_key?(opts.host)
+    redis_password = CONFIG[opts.host]['password']
+  end
 end
 
 r = Redis.new(host: opts.host, port: opts.port, password: redis_password)
@@ -85,6 +87,8 @@ rescue Redis::CannotConnectError
   error("redis is not connecting")
 rescue  Redis::CommandError
   error("redis password error")
+rescue Redis::ConnectionError
+  error("redis connection error")
 end
 channel = "sheepdog:"+opts.channel
 
