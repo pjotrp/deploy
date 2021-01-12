@@ -108,7 +108,7 @@ to a redis server running on a host named report.lan
 #!/bin/bash
 
 export stamp=$(date +%A-%Y%m%d-%H:%M:%S)
-sheepdog_run.rb -c "borg create /export/backup/borg-etc::P2_etc-$stamp /etc" --tag 'P2-ETC' --log --always --host report.lan
+sheepdog_run.rb -c "borg create /export/backup/borg-etc::P2_etc-$stamp /etc" --tag 'P2-ETC' --log --always --host reporthost
 ```
 
 ## Find if a directory changed
@@ -134,10 +134,11 @@ or curl job to the machine (see above), and monitoring job output,
 e.g. with above 'find if a directory changed'. In addition you can
 monitor for failig redis PINGs by adding a daily ping to redis with
 
-    sheepdog_ping.rb --host redishost
+    sheepdog_ping.rb --host reporthost
 
 and adding an 'expect' job to notify you if such a PING is not received
-in time.
+in time. Obviously one could run a ping every minute when reporting
+is critical.
 
 
 # Redis
@@ -167,7 +168,9 @@ the command line with `--password` or set in a file `~/.redis-pass`:
 
 Multiple hosts are supported.
 
-# Developing a new notification service
+# Extra info
+
+## Developing a new notification service
 
 To create a new notification service it is easiest to go through
 the following steps:
@@ -178,6 +181,31 @@ the following steps:
 
 The notifications contain stdout and stderr output which should be
 informative.
+
+## Typical CRON
+
+This is what CRON jobs look like. Make sure the scripts in a root CRON
+are only accessible by root!
+
+```cron
+GEM_PATH=/home/wrk/opt/deploy/lib/ruby/vendor_ruby
+PATH=/home/wrk/iwrk/deploy/deploy/bin:/home/wrk/opt/deploy/bin:/bin:/usr/bin
+
+# Once a week
+0 0 * * 0 sheepdog_run.rb -c '/sbin/fstrim -a' --tag TRIM_P2 --host reporthost --log --always >> ~/cron.log 2>&1
+
+22 4 * * 3 sheepdog_run.rb -c '/usr/bin/certbot renew --quiet' --tag CERTBOT_P2 --host reporthost >> ~/cron.log 2>&1
+
+# Every day
+0 0 * * * sheepdog_ping.rb --host reporthost
+
+# Every 6 hours
+0 0,6,12,18 * * * /export/backup/scripts/backup.sh  >> ~/cron.log 2>&1
+```
+
+Note that the redirection only for stuff not captured by sheepdog. It
+is rare to look into those outputs. If you leave it out CRON may try
+to send an E-mail on any output.
 
 # Install
 

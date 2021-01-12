@@ -23,6 +23,8 @@ def error(msg)
   exit(1)
 end
 
+CONFIG = nil
+
 # Read options file
 CONFIGFN = ENV['HOME']+"/.redis.conf"
 if File.exist?(CONFIGFN)
