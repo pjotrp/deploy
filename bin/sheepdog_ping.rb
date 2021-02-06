@@ -1,15 +1,10 @@
 #! /usr/bin/env ruby
 #
-# sheepdog_run executes a command and sends its result into a
-# monitoring queue. This runner is typically used in scripts or to
-# wrap CRON jobs. It will send a message into a redis 'queue', e.g.
-# on failure.
+# Ping redis - always reports SUCCESS and never FAIL (because
+# that is when a connection fails. Use an expect monitor.
 #
-# To view members you can run redis-cli with
-#
-#   redis-cli  Smembers sheepdog:run
-#
-# or use sheepdog_list.rb
+# This is to have a consistent method for making sure the
+# redis connection works (and machines are up).
 
 require 'json'
 require 'open3'
@@ -18,12 +13,13 @@ require 'ostruct'
 require 'redis'
 require 'socket'
 
-def error(msg)
-  print("ERROR: "+msg+" (sheepdog)\n")
-  exit(1)
-end
+error_msg = nil
+errval = 0
 
-CONFIG = nil
+def error(msg)
+  error_msg = "ERROR: "+msg+" (sheepdog)"
+  errval = 1
+end
 
 # Read options file
 CONFIGFN = ENV['HOME']+"/.redis.conf"
@@ -33,20 +29,16 @@ end
 
 redis_password = nil
 options = {
+  always: true,
   cmd: 'echo "Hello world"',
   channel: 'run',
+  tag: 'PING',
   host: 'localhost',
   port: 6379 # redis port
 }
 OptionParser.new do |opts|
   opts.banner = "Usage: sheepdog_run.rg [options]"
 
-  opts.on("-c", "--cmd full", "Run command") do |cmd|
-    options[:cmd] = cmd
-  end
-  opts.on("--always", "Always report SUCC or FAIL") do |always|
-    options[:always] = always
-  end
   opts.on("-h", "--host name", "Attach to redis on host") do |host|
     options[:host] = host
   end
@@ -87,41 +79,22 @@ rescue Redis::CannotConnectError
   error("redis is not connecting")
 rescue  Redis::CommandError
   error("redis password error")
-rescue Redis::ConnectionError
-  error("redis connection error")
 end
-channel = "sheepdog:"+opts.channel
-
-starting = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-
-begin
-  stdout, stderr, status = Open3.capture3(opts.cmd)
-  errval = status.exitstatus
-rescue Errno::ENOENT
-  stderr = "Command not found"
-  err    = "CMD_NOT_FOUND"
-  errval = 1
-end
-
-ending = Process.clock_gettime(Process::CLOCK_MONOTONIC)
-elapsed = ending - starting
 
 time = Time.now
-# timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
-timestamp = time.to_i
 
 event = {
   time: time.to_s,
-  elapsed: elapsed.round(),
+  elapsed: 0,
   host: Socket.gethostname,
-  command: opts.cmd,
+  command: 'sheepdog_ping.rb',
   tag: opts.tag,
-  stdout: stdout,
-  stderr: stderr,
+  stdout: "",
+  stderr: error_msg,
   status: errval
 }
 
-id = channel
+id = 'sheepdog:'+opts.channel
 
 if errval != 0
   event[:err] = "FAIL"

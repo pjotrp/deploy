@@ -36,9 +36,14 @@ is being phased out.
 
 Sheepdog is a tool for monitoring services. The idea is simple: use a
 wrapper script to capture output of, for example, a backup run. On
-error push a message out into a queue. By default we use redis, but
-syslog and others may also be used. The advantage of redis is that it
-is not host bound and easy to query.
+error push a message out into a queue. The basic premises are:
+
+- Only notify on FAIL
+- Separation of concerns
+- Make debugging of scripts easy
+
+By default we use redis, but syslog and others may also be used. The
+advantage of redis is that it is not host bound and easy to query.
 
     ./bin/sheepdog_run.rb -v -c 'echo "HELLO WORLD"'
 
@@ -79,6 +84,33 @@ last status of services do
 We host a reference implementation here. Sheepdog has a number
 of tricks:
 
+## jq for filtered output
+
+Reduce the number of fields:
+
+    sheepdog_list.rb --status|jq '.[]| { time: .time, tag: .tag, status: .status }'
+
+To see only the failing tags (-c outputs a record on a single line):
+
+    sheepdog_list.rb --status|jq -c '.[]| select(.status=="FAIL") | { time: .time, tag: .tag, status: .status }'
+
+```js
+{"time":"2021-01-10 09:42:46 +0100","tag":"FETCH_P2","status":"FAIL"}
+{"time":"2021-01-11 02:00:02 -0600","tag":"CHK_BORG_GN2","status":"FAIL"}
+```
+
+## Backups
+
+An example for making a backup with the excellent borg tool, reporting
+to a redis server running on a host named report.lan
+
+```sh
+#!/bin/bash
+
+export stamp=$(date +%A-%Y%m%d-%H:%M:%S)
+sheepdog_run.rb -c "borg create /export/backup/borg-etc::P2_etc-$stamp /etc" --tag 'P2-ETC' --log --always --host reporthost
+```
+
 ## Find if a directory changed
 
 When doing backups we want to know (1) whether a command ran,
@@ -93,6 +125,21 @@ to see if anything changed in the last days. Sheepdog can do
     sheepdog_run.rb -v -c 'find . -iname "*" -mtime -2 -print|grep bin'
 
 where `grep` generates a return value.
+
+## Monitor the monitor
+
+Ok, you have a notification for your backup job. How do you know when
+the server just stopped working? There are three things to add: a ping
+or curl job to the machine (see above), and monitoring job output,
+e.g. with above 'find if a directory changed'. In addition you can
+monitor for failig redis PINGs by adding a daily ping to redis with
+
+    sheepdog_ping.rb --host reporthost
+
+and adding an 'expect' job to notify you if such a PING is not received
+in time. Obviously one could run a ping every minute when reporting
+is critical.
+
 
 # Redis
 
@@ -120,6 +167,45 @@ the command line with `--password` or set in a file `~/.redis-pass`:
 ```
 
 Multiple hosts are supported.
+
+# Extra info
+
+## Developing a new notification service
+
+To create a new notification service it is easiest to go through
+the following steps:
+
+1. Create notification with `-v` and '`--always` flags
+2. Run notification every minute (in CRON)
+3. After making sure it works relax (1) and (2).
+
+The notifications contain stdout and stderr output which should be
+informative.
+
+## Typical CRON
+
+This is what CRON jobs look like. Make sure the scripts in a root CRON
+are only accessible by root!
+
+```cron
+GEM_PATH=/home/wrk/opt/deploy/lib/ruby/vendor_ruby
+PATH=/home/wrk/iwrk/deploy/deploy/bin:/home/wrk/opt/deploy/bin:/bin:/usr/bin
+
+# Once a week
+0 0 * * 0 sheepdog_run.rb -c '/sbin/fstrim -a' --tag TRIM_P2 --host reporthost --log --always >> ~/cron.log 2>&1
+
+22 4 * * 3 sheepdog_run.rb -c '/usr/bin/certbot renew --quiet' --tag CERTBOT_P2 --host reporthost >> ~/cron.log 2>&1
+
+# Every day
+0 0 * * * sheepdog_ping.rb --host reporthost
+
+# Every 6 hours
+0 0,6,12,18 * * * /export/backup/scripts/backup.sh  >> ~/cron.log 2>&1
+```
+
+Note that the redirection only for stuff not captured by sheepdog. It
+is rare to look into those outputs. If you leave it out CRON may try
+to send an E-mail on any output.
 
 # Install
 
