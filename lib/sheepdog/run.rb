@@ -1,5 +1,4 @@
 require 'open3'
-require 'socket'
 
 def run(tag,cmd)
   starting = Process.clock_gettime(Process::CLOCK_MONOTONIC)

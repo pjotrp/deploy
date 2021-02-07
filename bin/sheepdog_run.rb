@@ -11,7 +11,8 @@
 #
 # or use sheepdog_list.rb
 
-$: << 'lib'
+rootpath = File.dirname(File.dirname(__FILE__))
+$: << File.join(rootpath,'lib')
 
 require 'optparse'
 require 'ostruct'

@@ -3,23 +3,15 @@
 # sheepdog_list prints the queue
 #
 
+rootpath = File.dirname(File.dirname(__FILE__))
+$: << File.join(rootpath,'lib')
+
 require 'json'
 require 'optparse'
 require 'ostruct'
 require 'redis'
+require 'sheepdog'
 
-def error(msg)
-  $stderr.print("ERROR: "+msg+" (sheepdog)\n")
-  exit(1)
-end
-
-# Read options file
-CONFIGFN = ENV['HOME']+"/.redis.conf"
-if File.exist?(CONFIGFN)
-  CONFIG = JSON.parse(File.read(ENV['HOME']+"/.redis.conf"))
-end
-
-redis_password=nil
 options = {
   channel: 'run',
   host: 'localhost',
@@ -54,23 +46,9 @@ end.parse!
 
 verbose = options[:verbose]
 p options if verbose
-
 opts = OpenStruct.new(options)
 
-if CONFIG and opts.host and not redis_password
-  if CONFIG.has_key?(opts.host)
-    redis_password = CONFIG[opts.host]['password']
-  end
-end
-
-r = Redis.new(host: opts.host, port: opts.port, password: redis_password)
-begin
-  r.ping()
-rescue Redis::CannotConnectError
-  error("redis is not connecting")
-rescue  Redis::CommandError
-  error("redis password error")
-end
+r = redis_connect(opts)
 
 channel = "sheepdog:"+opts.channel
 
