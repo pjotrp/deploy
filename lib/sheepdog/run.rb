@@ -1,11 +1,11 @@
 require 'open3'
 require 'socket'
 
-def run(opts)
+def run(tag,cmd)
   starting = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
   begin
-    stdout, stderr, status = Open3.capture3(opts.cmd)
+    stdout, stderr, status = Open3.capture3(cmd)
     errval = status.exitstatus
   rescue Errno::ENOENT
     stderr = "Command not found"
@@ -24,8 +24,8 @@ def run(opts)
     time: time.to_s,
     elapsed: elapsed.round(),
     host: Socket.gethostname,
-    command: opts.cmd,
-    tag: opts.tag,
+    command: cmd,
+    tag: tag,
     stdout: stdout,
     stderr: stderr,
     status: errval

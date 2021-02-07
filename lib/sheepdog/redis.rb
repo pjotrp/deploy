@@ -1,13 +1,10 @@
 require 'json'
 require 'redis'
 
-CONFIG = nil
-
-# Read options file
 CONFIGFN = ENV['HOME']+"/.redis.conf"
-if File.exist?(CONFIGFN)
-  CONFIG = JSON.parse(File.read(ENV['HOME']+"/.redis.conf"))
-end
+CONFIG = if File.exist?(CONFIGFN)
+           JSON.parse(File.read(ENV['HOME']+"/.redis.conf"))
+         end
 
 def redis_get_password(opts)
   redis_password = nil
@@ -34,7 +31,7 @@ def redis_connect(opts)
   r
 end
 
-def report(r,event,opts)
+def redis_report(r,event,opts)
   channel = "sheepdog:"+opts.channel
   id = channel
   verbose = opts[:verbose]

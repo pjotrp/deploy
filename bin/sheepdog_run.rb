@@ -51,16 +51,13 @@ OptionParser.new do |opts|
   opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
     options[:verbose] = v
   end
-
 end.parse!
 
-verbose = options[:verbose]
-p options if verbose
-
+p options if options[:verbose]
 opts = OpenStruct.new(options)
 
 r = redis_connect(opts)
 
-event = run(opts)
+event = run(opts.tag,opts.cmd)
 
-report(r,event,opts)
+redis_report(r,event,opts)
