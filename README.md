@@ -1,12 +1,13 @@
-Deployment system for servers and home directories.  In conjuction
-with GNU Guix and (perhaps) the common workflow langauge (CWL)
-essentially a replacement for Puppet, Chef, Cfengine, Cfruby, GNU
-stow, etc.  See the doc/design.org document for more.
+This is a 'declarative' deployment system for servers and home
+directories.  In conjuction with GNU Guix and (perhaps) GWL and the
+common workflow langauge (CWL) essentially a replacement for Puppet,
+Chef, Cfengine, Cfruby, GNU stow, etc.  See the doc/design.org
+document for more.
 
 Historic note: at the time of Cfruby I decided that Cfruby was to be
 one of my last `large' software projects.  How these things come to
 haunt you! Cfruby is showing its age and now Deploy is bound to be a
-large project, again.
+large project, again. Well, maybe not. if I keep it minimalistic.
 
 More information can be found in the
 [design document](https://github.com/pjotrp/deploy/blob/master/doc/design.org).
@@ -111,6 +112,13 @@ export stamp=$(date +%A-%Y%m%d-%H:%M:%S)
 sheepdog_run.rb -c "borg create /export/backup/borg-etc::P2_etc-$stamp /etc" --tag 'P2-ETC' --log --always --host reporthost
 ```
 
+and after running many backups it was time to create `sheepdog_borg'
+which looks like
+
+```sh
+sheepdog_borg.rb --host reporthost -d /export/backup/borg-etc /etc
+```
+
 ## Find if a directory changed
 
 When doing backups we want to know (1) whether a command ran,
@@ -125,6 +133,12 @@ to see if anything changed in the last days. Sheepdog can do
     sheepdog_run.rb -v -c 'find . -iname "*" -mtime -2 -print|grep bin'
 
 where `grep` generates a return value.
+
+## Monitor a web service
+
+This can easily be done with curl and grep:
+
+    sheepdog_run.rb -c 'curl https://thebird.nl/|grep Pjotr'
 
 ## Monitor the monitor
 

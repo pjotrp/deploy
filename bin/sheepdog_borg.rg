@@ -11,10 +11,12 @@
 #
 # or use sheepdog_list.rb
 
-$: << 'lib'
-
+require 'json'
+require 'open3'
 require 'optparse'
 require 'ostruct'
+require 'redis'
+require 'socket'
 require 'sheepdog'
 
 options = {
@@ -26,9 +28,6 @@ options = {
 OptionParser.new do |opts|
   opts.banner = "Usage: sheepdog_run.rg [options]"
 
-  opts.on("-c", "--cmd full", "Run command") do |cmd|
-    options[:cmd] = cmd
-  end
   opts.on("--always", "Always report SUCC or FAIL") do |always|
     options[:always] = always
   end
@@ -61,6 +60,6 @@ opts = OpenStruct.new(options)
 
 r = redis_connect(opts)
 
-event = run(opts)
+event = run(opts.cmd)
 
-report(r,event,opts)
+r.report(event,opts)
