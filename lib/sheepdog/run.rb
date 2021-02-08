@@ -1,5 +1,23 @@
 require 'open3'
 
+def sheepdog_ping(tag,r)
+  ok = redis_ping(r)
+
+  errval = !ok
+  event = {
+    time: Time.new.to_s,
+    elapsed: 0,
+    host: Socket.gethostname,
+    command: 'sheepdog_ping.rb',
+    tag: tag,
+    stdout: "",
+    stderr: "",
+    status: 0,
+    err: "SUCCESS"
+  }
+  event
+end
+
 def run(tag,cmd)
   starting = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 

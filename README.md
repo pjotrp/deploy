@@ -146,7 +146,7 @@ Ok, you have a notification for your backup job. How do you know when
 the server just stopped working? There are three things to add: a ping
 or curl job to the machine (see above), and monitoring job output,
 e.g. with above 'find if a directory changed'. In addition you can
-monitor for failig redis PINGs by adding a daily ping to redis with
+monitor for failing redis PINGs by adding a daily ping to redis with
 
     sheepdog_ping.rb --host reporthost
 

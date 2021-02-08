@@ -19,6 +19,11 @@ end
 def redis_connect(opts)
   redis_password = redis_get_password(opts)
   r = Redis.new(host: opts.host, port: opts.port, password: redis_password)
+  redis_ping(r)
+  r
+end
+
+def redis_ping(r)
   begin
     r.ping()
   rescue Redis::CannotConnectError
@@ -28,7 +33,7 @@ def redis_connect(opts)
   rescue Redis::ConnectionError
     error("redis connection error")
   end
-  r
+  true
 end
 
 def redis_report(r,event,opts)
