@@ -1,5 +1,6 @@
 require 'json'
 require 'redis'
+require 'colorize'
 
 CONFIGFN = ENV['HOME']+"/.redis.conf"
 CONFIG = if File.exist?(CONFIGFN)
@@ -43,8 +44,13 @@ def redis_report(r,event,opts)
 
   if opts.always or event[:status] != 0
     if verbose
-      puts(event)
-      puts("Pushing out an event (#{id})\n")
+      event2 = event.dup
+      event2[:stdout] = nil
+      event2[:stderr] = nil
+      print(event2.to_s.green,"\n")
+      print(event[:stdout].blue)
+      print(event[:stderr].red)
+      puts("Pushing out an event (#{id})\n".green)
     end
     json = event.to_json
     r.sadd(id,json)
@@ -52,6 +58,6 @@ def redis_report(r,event,opts)
       File.open(opts.log,"a") { |f| f.print(json,",\n") }
     end
   else
-    puts("No event to report (#{id})") if verbose
+    puts("No event to report (#{id})".green) if verbose
   end
 end

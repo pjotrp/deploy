@@ -1,4 +1,5 @@
 require 'open3'
+require 'colorize'
 
 def sheepdog_ping(tag,r)
   ok = redis_ping(r)
@@ -18,9 +19,10 @@ def sheepdog_ping(tag,r)
   event
 end
 
-def run(tag,cmd)
+def run(tag,cmd,verbose=false)
   starting = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
+  print(cmd.blue+"\n") if verbose
   begin
     stdout, stderr, status = Open3.capture3(cmd)
     errval = status.exitstatus

@@ -116,7 +116,7 @@ and after running many backups it was time to create `sheepdog_borg'
 which looks like
 
 ```sh
-sheepdog_borg.rb --backup-repo /export/backup/borg-etc /etc
+sheepdog_borg.rb -b /export/backup/borg-etc /etc
 ```
 
 ## Find if a directory changed
