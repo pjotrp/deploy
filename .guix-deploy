@@ -3,5 +3,5 @@ echo "redis-server"
 
 env GUIX_PACKAGE_PATH=~/iwrk/opensource/guix/guix-bioinformatics/ ~/.config/guix/current/bin/guix environment --pure --ad-hoc ruby ruby-redis redis jq ruby-colorize
  
-# env GUIX_PACKAGE_PATH=~/iwrk/opensource/guix/guix-bioinformatics/ ~/.config/guix/current/bin/guix package -i ruby ruby-redis redis jq -p ~/opt/deploy
+# env GUIX_PACKAGE_PATH=~/iwrk/opensource/guix/guix-bioinformatics/ ~/.config/guix/current/bin/guix package -i ruby ruby-redis redis ruby-colorize jq -p ~/opt/deploy 
 #
