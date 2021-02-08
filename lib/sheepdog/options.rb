@@ -1,8 +1,13 @@
+require 'optparse'
+require 'ostruct'
 
 def get_options(opts, options, func = nil)
   OptionParser.new do |opts|
     opts.banner = "Usage: sheepdog_run.rg [options]"
 
+    opts.on("--always", "Always report SUCC or FAIL") do |always|
+      options[:always] = always
+    end
     opts.on("-h", "--host name", "Attach to redis on host") do |host|
       options[:host] = host
     end
@@ -26,7 +31,6 @@ def get_options(opts, options, func = nil)
     func.call(opts,options) if func
 
   end.parse!
-
 
   p options if options[:verbose]
 

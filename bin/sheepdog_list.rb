@@ -9,7 +9,6 @@ $: << File.join(rootpath,'lib')
 require 'json'
 require 'optparse'
 require 'ostruct'
-require 'redis'
 require 'sheepdog'
 
 options = {
@@ -17,36 +16,16 @@ options = {
   host: 'localhost',
   port: 6379 # redis port
 }
-OptionParser.new do |opts|
-  opts.banner = "Usage: sheepdog_list.rg [options]"
 
-  opts.on("-c", "--cmd full", "Run command") do |cmd|
-    options[:cmd] = cmd
-  end
-  opts.on("--[no-]json", "Output valid JSON") do |json|
-    options[:json] = json
-  end
-  opts.on("--status", "Output status") do |status|
-    options[:status] = status
-  end
-  opts.on("-h", "--host name", "Attach to redis on host") do |host|
-    options[:host] = host
-  end
-  opts.on("-p", "--port num", Integer, "Attach to redis on port") do |port|
-    options[:port] = port
-  end
-  opts.on("--password str", "Attach to redis with password") do |pwd|
-    redis_password = pwd
-  end
-  opts.on("-v", "--[no-]verbose", "Run verbosely") do |v|
-    options[:verbose] = v
-  end
-
-end.parse!
-
+opts = get_options(opts,options, lambda { |opts,options|
+                     opts.on("--[no-]json", "Output valid JSON") do |json|
+                       options[:json] = json
+                     end
+                     opts.on("--status", "Output status") do |status|
+                       options[:status] = status
+                     end
+                   })
 verbose = options[:verbose]
-p options if verbose
-opts = OpenStruct.new(options)
 
 r = redis_connect(opts)
 
