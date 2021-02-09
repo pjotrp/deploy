@@ -18,7 +18,7 @@ def get_options(opts, options, func = nil)
       redis_password = pwd
     end
     opts.on("-t", "--tag tag", "Set message tag") do |tag|
-      options[:tag] = 'PING '+tag
+      options[:tag] = tag
     end
     opts.on("--log [file]", "Also log output to file (default sheepdog.log)") do |log|
       log = "sheepdog.log" if not log
