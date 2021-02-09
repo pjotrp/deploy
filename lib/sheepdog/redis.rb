@@ -37,7 +37,17 @@ def redis_ping(r)
   true
 end
 
-def redis_report(r,event,opts)
+def redis_report(r,event,opts, filter = nil)
+  select = lambda do |buf|
+    lines = buf.split("\n")
+    if lines.length > 3
+      lines = filter.call(lines) if filter
+      if not opts[:full_output]
+        lines = [[lines[0],"(...)"]+lines.slice(-3,3)]
+      end
+    end
+    lines.join("\n")
+  end
   channel = "sheepdog:"+opts.channel
   id = channel
   verbose = opts[:verbose]
@@ -47,9 +57,9 @@ def redis_report(r,event,opts)
       event2 = event.dup
       event2[:stdout] = nil
       event2[:stderr] = nil
+      print(select.call(event[:stdout]).blue,"\n")
+      print(select.call(event[:stderr]).red,"\n")
       print(event2.to_s.green,"\n")
-      print(event[:stdout].blue)
-      print(event[:stderr].red)
       puts("Pushing out an event (#{id})\n".green)
     end
     json = event.to_json

@@ -22,7 +22,7 @@ end
 def run(tag,cmd,verbose=false)
   starting = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
-  print(cmd.blue+"\n") if verbose
+  print(cmd.green+"\n") if verbose
   begin
     stdout, stderr, status = Open3.capture3(cmd)
     errval = status.exitstatus

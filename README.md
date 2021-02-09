@@ -119,6 +119,11 @@ which looks like
 sheepdog_borg.rb -b /export/backup/borg-etc /etc
 ```
 
+`sheepdog_borg` checks file permissions and will only run with a
+passphrase set in $HOME/.borg-pass.  See the script for more info.
+`sheepdog_borg` can be run as root. For security reasons, do not do
+set that up as a CRON job.
+
 ## Find if a directory changed
 
 When doing backups we want to know (1) whether a command ran,

@@ -24,6 +24,9 @@ def get_options(opts, options, func = nil)
       log = "sheepdog.log" if not log
       options[:log] = log
     end
+    opts.on("--full", "Show full output (no stripping)") do |b|
+      options[:full_output] = b
+    end
     opts.on("-v", "--[no-]verbose", "Run verbosely (--no-verbose is quiet mode)") do |v|
       options[:verbose] = v
     end
