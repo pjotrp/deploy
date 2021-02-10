@@ -40,10 +40,10 @@ end
 def redis_report(r,event,opts, filter = nil)
   select = lambda do |buf|
     lines = buf.split("\n")
-    if lines.length > 3
+    if lines.length > 5
       lines = filter.call(lines) if filter
       if not opts[:full_output]
-        lines = [[lines[0],"(...)"]+lines.slice(-3,3)]
+        lines = [[lines.slice(0,2),"(...)"]+lines.slice(-3,3)]
       end
     end
     lines.join("\n")
