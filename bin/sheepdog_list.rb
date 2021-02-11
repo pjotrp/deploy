@@ -10,6 +10,7 @@ require 'json'
 require 'optparse'
 require 'ostruct'
 require 'sheepdog'
+require 'colorize'
 
 options = {
   channel: 'run',
@@ -24,8 +25,15 @@ opts = get_options(opts,options, lambda { |opts,options|
                      opts.on("--status", "Output status") do |status|
                        options[:status] = status
                      end
+                     opts.on("--failed", "Show records matching FAIL") do |b|
+                       options[:failed] = b
+                     end
+                     opts.on("--filter regex", "Show records matching regex") do |regex|
+                       options[:filter] = regex
+                     end
                    })
 verbose = options[:verbose]
+filter = options[:filter]
 
 r = redis_connect(opts)
 
@@ -36,8 +44,8 @@ status = {}
 print("[") if opts.json
 r.smembers(channel).sort.each_with_index do | buf,i |
   begin
-    json = JSON::parse(buf)
-    e = OpenStruct.new(json)
+    event = JSON::parse(buf)
+    e = OpenStruct.new(event)
   rescue JSON::ParserError
     next
   end
@@ -51,11 +59,27 @@ r.smembers(channel).sort.each_with_index do | buf,i |
     min = sprintf("%.2d",e.elapsed/60)
     sec = sprintf("%.2d",e.elapsed % 60)
   end
+  next if options.has_key?(:failed) and e.err != "FAIL"
+  next if filter and (e.tag !~ /#{filter}/ and e.host !~ /#{filter}/)
   if opts.json
     print(",") if i>0
     print(buf)
   elsif opts.status
-    # skip
+  # skip
+  elsif opts.filter
+    event.delete("stderr")
+    event.delete("stdout")
+    if opts.full_output
+      print(e.stdout.blue,"\n") if e.stdout
+      print(e.stderr.red,"\n") if e.stderr
+    else
+      lines = e.stderr.split("\n")
+      if lines.length > 3
+        lines = lines.slice(-3,3)
+      end
+      print(lines.join("\n").red)
+    end
+    print(event.to_s.green,"\n")
   else
     print("#{e.time} (#{e.host}) #{e.err} #{e.status} <#{min}m#{sec}s> #{tag}")
     print("\n")
