@@ -122,7 +122,8 @@ sheepdog_borg.rb -b /export/backup/borg-etc /etc
 `sheepdog_borg` checks file permissions and will only run with a
 passphrase set in $HOME/.borg-pass.  See the script for more info.
 `sheepdog_borg` can be run as root. For security reasons, do not do
-set that up as a CRON job.
+set that up as a CRON job (unless sheepdog and scripts are installed
+by Guix into the immutable store).
 
 ## Find if a directory changed
 
@@ -174,8 +175,9 @@ DEL sheepdog:run
 
 ## Using passwords
 
-When a server is configured with a password it can be passed on
-the command line with `--password` or set in a file `~/.redis-pass`:
+When a server is configured with a password it can be passed on the
+command line with `--password` or set in a file
+`~/.config/sheepdog/sheepdog.conf`:
 
 ```js
 {
@@ -185,7 +187,10 @@ the command line with `--password` or set in a file `~/.redis-pass`:
 }
 ```
 
-Multiple hosts are supported.
+Multiple hosts are supported in principle, but behaviour is (yet)
+undefined. When you specify a host on the command line it will send a
+message to that host using the password. Here, hostname will be the default
+message queue and that can be overridden with the `--host` switch.
 
 # Extra info
 

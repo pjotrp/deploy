@@ -2,9 +2,17 @@ require 'json'
 require 'redis'
 require 'colorize'
 
-CONFIGFN = ENV['HOME']+"/.redis.conf"
+HOME=ENV['HOME']
+DEFAULT_CONFIGFN = HOME+"/.config/sheepdog/sheepdog.conf"
+
+CONFIGFN = if File.exist?(DEFAULT_CONFIGFN)
+             DEFAULT_CONFIGFN
+           else
+             HOME+"/.redis.conf"
+           end
 CONFIG = if File.exist?(CONFIGFN)
-           JSON.parse(File.read(ENV['HOME']+"/.redis.conf"))
+           print("Reading #{CONFIGFN}\n")
+           JSON.parse(File.read(CONFIGFN))
          end
 
 def redis_get_password(opts)

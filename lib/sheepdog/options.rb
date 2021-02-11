@@ -2,6 +2,8 @@ require 'optparse'
 require 'ostruct'
 
 def get_options(opts, options, func = nil)
+  options[:host] = CONFIG.keys.first if CONFIG
+
   OptionParser.new do |opts|
     opts.banner = "Usage: sheepdog_run.rg [options]"
 
@@ -35,6 +37,7 @@ def get_options(opts, options, func = nil)
 
   end.parse!
 
+  options[:config] = CONFIGFN
   p options if options[:verbose]
 
   OpenStruct.new(options)
