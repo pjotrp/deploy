@@ -69,6 +69,6 @@ repo = dir+"::"+options[:tag]+"-"+stamp
 cmd = "borg create \""+repo+"\" "+ARGV.join(" ")
 
 cmd += " "+options[:args] if options[:args]
-event = run(repo,cmd,options[:verbose])
+event = run(options[:tag],cmd,options[:verbose])
 
 redis_report(r,event,opts)

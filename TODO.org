@@ -1,0 +1,9 @@
+# TODO
+
+## Sheepdog
+
+- [ ] package in GNU Guix for root scripts
+- [ ] list current state - it means parsing the state list
+- [ ] synchronize between queues using a dump
+- [ ] sheepdog_expect.rb - expect PINGs
+- [ ] sheepdog_rsync.rb
