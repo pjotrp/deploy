@@ -11,7 +11,6 @@ CONFIGFN = if File.exist?(DEFAULT_CONFIGFN)
              HOME+"/.redis.conf"
            end
 CONFIG = if File.exist?(CONFIGFN)
-           print("Reading #{CONFIGFN}\n")
            JSON.parse(File.read(CONFIGFN))
          end
 

@@ -30,7 +30,9 @@ opts = get_options(opts,options, lambda { |opts,options|
                      end
                    })
 verbose = options[:verbose]
-filter = options[:filter]
+filter  = options[:filter]
+tag     = options[:tag]
+
 e = options[:elapse]
 elapse =
   if e =~ /(\d+)h/
@@ -61,6 +63,23 @@ r.smembers(channel).sort.each_with_index do | buf,i |
     p [e.time,e.host,e.tag,e.err] if verbose
     status = 0
   end
+end
+
+tag = 'EXPECT_'+filter if not tag and filter
+
+if status>0
+  event = {
+    time: Time.now().to_s,
+    elapsed: 0,
+    host: Socket.gethostname,
+    command: filter,
+    tag: tag,
+    stdout: "",
+    stderr: "",
+    err: "FAIL",
+    status: status
+  }
+  redis_report(r,event,opts)
 end
 
 exit status
