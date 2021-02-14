@@ -208,8 +208,8 @@ informative.
 
 ## Typical CRON
 
-This is what CRON jobs look like. Make sure the scripts in a root CRON
-are only accessible by root!
+This is what CRON jobs look like. To prevent injection, make sure the
+scripts in a root CRON are only accessible by root!
 
 ```cron
 GEM_PATH=/home/wrk/opt/deploy/lib/ruby/vendor_ruby
@@ -230,6 +230,16 @@ PATH=/home/wrk/iwrk/deploy/deploy/bin:/home/wrk/opt/deploy/bin:/bin:/usr/bin
 Note that the redirection only for stuff not captured by sheepdog. It
 is rare to look into those outputs. If you leave it out CRON may try
 to send an E-mail on any output.
+
+# Check for connections
+
+Sheepdog has an expect function to check for servers connecting. For example,
+running the following on the queue
+
+    sheepdog_expect.rb --filter penguin2 --elapse 3h
+
+will add a FAIL event if penguin2 has not connected in the last three
+hours, i.e. no messages where received in the queue.
 
 # Install
 
