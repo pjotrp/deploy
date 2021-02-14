@@ -13,6 +13,7 @@ CONFIGFN = if File.exist?(DEFAULT_CONFIGFN)
 CONFIG = if File.exist?(CONFIGFN)
            JSON.parse(File.read(CONFIGFN))
          end
+CONFIG['HOME'] = HOME
 
 def redis_get_password(opts)
   redis_password = nil
@@ -67,7 +68,7 @@ def redis_report(r,event,opts, filter = nil)
       print(select.call(event[:stdout]).blue,"\n")
       print(select.call(event[:stderr]).red,"\n")
       print(event2.to_s.green,"\n")
-      puts("Pushing out an event (#{id})\n".green)
+      puts("Pushing out event <#{id}> to <#{opts.host}>\n".green)
     end
     json = event.to_json
     r.sadd(id,json)
@@ -75,6 +76,6 @@ def redis_report(r,event,opts, filter = nil)
       File.open(opts.log,"a") { |f| f.print(json,",\n") }
     end
   else
-    puts("No event to report (#{id})".green) if verbose
+    puts("No event to report <#{id}>".green) if verbose
   end
 end

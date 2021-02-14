@@ -8,7 +8,7 @@ def sheepdog_ping(tag,r)
   event = {
     time: Time.new.to_s,
     elapsed: 0,
-    host: Socket.gethostname,
+    host: Socket.gethostname, # sending host
     command: 'sheepdog_ping.rb',
     tag: tag,
     stdout: "",
@@ -42,7 +42,7 @@ def run(tag,cmd,verbose=false)
   event = {
     time: time.to_s,
     elapsed: elapsed.round(),
-    host: Socket.gethostname,
+    host: Socket.gethostname, # sending host
     command: cmd,
     tag: tag,
     stdout: stdout,
