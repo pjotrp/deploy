@@ -13,7 +13,7 @@ CONFIGFN = if File.exist?(DEFAULT_CONFIGFN)
 CONFIG = if File.exist?(CONFIGFN)
            JSON.parse(File.read(CONFIGFN))
          end
-CONFIG['HOME'] = HOME
+# CONFIG['HOME'] = HOME
 
 def redis_get_password(opts)
   redis_password = nil
