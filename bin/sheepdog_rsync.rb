@@ -42,7 +42,7 @@ cmd += " "+files.join(" ")+" "+destdir
 event = run(options[:tag],cmd,options[:verbose])
 
 if event[:err] == "SUCCESS"
-  if event[:stdout] =~ /total size is/
+  if event[:stdout] =~ /total size is 0/
     event[:err] = "CHECK"
   end
 end
