@@ -1,8 +1,11 @@
-This is a 'declarative' deployment system for servers and home
+This is a simple 'declarative' deployment system for servers and home
 directories.  In conjuction with GNU Guix and (perhaps) GWL and the
 common workflow langauge (CWL) essentially a replacement for Puppet,
 Chef, Cfengine, Cfruby, GNU stow, etc.  See the doc/design.org
 document for more.
+
+deploy now comes with the `sheepdog`: a minimalist monitor and
+notification system.
 
 Historic note: at the time of Cfruby I decided that Cfruby was to be
 one of my last `large' software projects.  How these things come to
@@ -201,7 +204,9 @@ the following steps:
 
 1. Create notification with `-v` and '`--always` flags
 2. Run notification every minute (in CRON)
-3. After making sure it works relax (1) and (2).
+3. Use sheepdog_list to monitor the queue
+4. Add `-v --full` and `--filter` options to view stdout/stderr
+5. After making sure it works relax (1) and (2)
 
 The notifications contain stdout and stderr output which should be
 informative.
