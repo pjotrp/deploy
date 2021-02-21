@@ -35,7 +35,7 @@ borg_passphrase = ENV['BORG_PASSPHRASE']
 
 stamp = Time.now.strftime("%Y%m%d-%H:%M-%a")
 
-cmd = "rsync -va"
+cmd = "rsync -rt"
 cmd += " "+options[:args] if options[:args]
 cmd += " "+files.join(" ")+" "+destdir
 
