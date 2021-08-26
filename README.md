@@ -10,7 +10,7 @@ notification system.
 Historic note: at the time of Cfruby I decided that Cfruby was to be
 one of my last `large' software projects.  How these things come to
 haunt you! Cfruby is showing its age and now Deploy is bound to be a
-large project, again. Well, maybe not. if I keep it minimalistic.
+large project, again. Well, maybe not, if I keep it minimalistic.
 
 More information can be found in the
 [design document](https://github.com/pjotrp/deploy/blob/master/doc/design.org).
