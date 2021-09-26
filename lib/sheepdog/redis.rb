@@ -28,7 +28,7 @@ end
 def redis_connect(opts)
   redis_password = redis_get_password(opts)
   r = Redis.new(host: opts.host, port: opts.port, password: redis_password)
-  redis_ping(r)
+  return nil if not redis_ping(r)
   r
 end
 
@@ -36,16 +36,20 @@ def redis_ping(r)
   begin
     r.ping()
   rescue Redis::CannotConnectError
-    error("redis is not connecting")
+    warning("redis is not connecting")
+    return false
   rescue  Redis::CommandError
-    error("redis password error")
+    warning("redis password error")
+    return false
   rescue Redis::ConnectionError
-    error("redis connection error")
+    warning("redis connection error")
+    return false
   end
   true
 end
 
 def redis_report(r,event,opts, filter = nil)
+  verbose = opts[:verbose]
   select = lambda do |buf|
     lines = buf.split("\n")
     if lines.length > 5
@@ -58,7 +62,6 @@ def redis_report(r,event,opts, filter = nil)
   end
   channel = "sheepdog:"+opts.channel
   id = channel
-  verbose = opts[:verbose]
 
   if opts.always or event[:status] != 0
     if verbose
@@ -71,7 +74,12 @@ def redis_report(r,event,opts, filter = nil)
       puts("Pushing out event <#{id}> to <#{opts.host}>\n".green)
     end
     json = event.to_json
-    r.sadd(id,json)
+    if r == nil
+      puts("redis: can not write event to queue".green)
+      return
+    else
+      r.sadd(id,json)
+    end
     if opts.log
       File.open(opts.log,"a") { |f| f.print(json,",\n") }
     end
