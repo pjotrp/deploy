@@ -15,7 +15,8 @@ large project, again. Well, maybe not, if I keep it minimalistic.
 More information can be found in the
 [design document](https://github.com/pjotrp/deploy/blob/master/doc/design.org).
 
-Early days for deploy, YMMV.
+Even though it is early days for deploy and sheepdog we use it every
+day in production environments. YMMV.
 
 Pjotr Prins (c) 2015-2021
 
@@ -84,6 +85,9 @@ Check jq out. It has a lot of powerful filters. To get the
 last status of services do
 
     ./bin/sheepdog_list.rb --status|jq
+
+Note that if redis fails to respond the commands will still run, but
+(obviously) no event is recorded in redis.
 
 We host a reference implementation here. Sheepdog has a number
 of tricks:
