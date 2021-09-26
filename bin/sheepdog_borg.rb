@@ -66,7 +66,7 @@ if not File.directory?(dir)
 end
 
 repo = dir+"::"+options[:tag]+"-"+stamp
-cmd = "borg create \""+repo+"\" "+ARGV.join(" ")
+cmd = "yes|borg create \""+repo+"\" "+ARGV.join(" ")
 
 cmd += " "+options[:args] if options[:args]
 event = run(options[:tag],cmd,options[:verbose])
