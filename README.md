@@ -250,7 +250,7 @@ hours, i.e. no messages where received in the queue.
 
 To install dependencies:
 
-    env GUIX_PACKAGE_PATH=~/iwrk/opensource/guix/guix-bioinformatics/ ~/.config/guix/current/bin/guix package -i ruby ruby-redis redis jq -p ~/opt/deploy
+    guix package -i ruby ruby-redis redis jq ruby-colorize borg -p ~/opt/deploy
 
 Setup the environment
 
