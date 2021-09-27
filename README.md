@@ -215,6 +215,22 @@ the following steps:
 The notifications contain stdout and stderr output which should be
 informative.
 
+## E-mail failures
+
+We can tell sheepdog to sent E-mails on failure. There are two scenarios:
+
+1. E-mail directly - for critical services
+2. E-mail daily digest - e.g., for backups
+
+Receiving E-mails is very annoying, so when the sheepdog barks it
+should be worth resolving.
+
+To E-mail on failure simply use the `--email` switch:
+
+```sh
+sheepdog_rsync.rb --tag RSYNC_P2 genenetwork.org:/export/backup/tux01/* /export/backup/tux01/ --always --email admin@genenetwork.org -v --log --args '--delete'
+```
+
 ## Typical CRON
 
 This is what CRON jobs look like. To prevent injection, make sure the

@@ -26,6 +26,9 @@ def get_options(opts, options, func = nil)
       log = "sheepdog.log" if not log
       options[:log] = log
     end
+    opts.on("--email address", "Send E-mail on fail") do |email|
+      options[:email] = email
+    end
     opts.on("--full", "Show full output (no stripping)") do |b|
       options[:full_output] = b
     end

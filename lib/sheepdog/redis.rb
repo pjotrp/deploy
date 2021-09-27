@@ -1,6 +1,7 @@
 require 'json'
 require 'redis'
 require 'colorize'
+require 'sheepdog/email'
 
 HOME=ENV['HOME']
 DEFAULT_CONFIGFN = HOME+"/.config/sheepdog/sheepdog.conf"
@@ -48,7 +49,7 @@ def redis_ping(r)
   true
 end
 
-def redis_report(r,event,opts, filter = nil)
+def redis_report(r, event, opts, filter = nil)
   verbose = opts[:verbose]
   select = lambda do |buf|
     lines = buf.split("\n")
@@ -85,5 +86,10 @@ def redis_report(r,event,opts, filter = nil)
     end
   else
     puts("No event to report <#{id}>".green) if verbose
+  end
+  if opts.email and event[:status] != 0
+    puts("Sending E-mail to #{opts.email}".green)
+    msg = "Subject: sheepdog failed!\n\n"+json+"\n"
+    send_mail(opts.email,msg)
   end
 end
