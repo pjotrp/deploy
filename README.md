@@ -1,3 +1,5 @@
+# DEPLOY and SHEEPDOG
+
 This is a simple 'declarative' deployment system for servers and home
 directories.  In conjuction with GNU Guix and (perhaps) GWL and the
 common workflow langauge (CWL) essentially a replacement for Puppet,
@@ -36,6 +38,10 @@ Sorry, initially, no transactions, parallelization, fancy error
 reporting etc. Use GNU Guix properly for doing deployment right! At
 this stage I have started using deploy for machine management. Cfruby
 is being phased out.
+
+## TODO
+
+- https://github.com/genenetwork/gn-gemtext-threads/blob/main/topics/systems/sheepdog.gmi
 
 # Sheepdog
 
