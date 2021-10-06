@@ -19,6 +19,7 @@ def sheepdog_ping(tag,r)
   event
 end
 
+# Run a command and return an event
 def run(tag, cmd, verbose=false)
   starting = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 

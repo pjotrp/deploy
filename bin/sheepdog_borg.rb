@@ -29,6 +29,9 @@ opts = get_options(opts,options, lambda { |opts,options|
                      opts.on("--init", "Initialize") do ||
                        options[:init] = true
                      end
+                     opts.on("--group grp", "Set group permissions") do |grp|
+                       options[:group] = grp
+                     end
                    })
 
 dir = options[:backup_repo]
@@ -59,16 +62,27 @@ ENV['BORG_PASSPHRASE'] = borg_passphrase
 
 stamp = Time.now.strftime("%Y%m%d-%H:%M-%a")
 
+runner = lambda { | info, cmd |
+  event = run(options[:tag]+"-"+info,cmd,options[:verbose])
+  redis_report(r,event,opts)
+}
 
+# ---- Initialize backup repo
 if not File.directory?(dir)
   cmd = "borg init --encryption=repokey-blake2 #{dir}"
-  print(`#{cmd}`)
+  runner.call("init",cmd)
 end
 
+# ---- Create backup
 repo = dir+"::"+options[:tag]+"-"+stamp
 cmd = "yes|borg create \""+repo+"\" "+ARGV.join(" ")
 
 cmd += " "+options[:args] if options[:args]
-event = run(options[:tag],cmd,options[:verbose])
+runner.call("create",cmd)
 
-redis_report(r,event,opts)
+# ---- Try to set group permissions
+group = options[:group]
+if group
+  runner.call("chgrp","chgrp #{group} -R #{dir}")
+  runner.call("chmod","chmod g+r -R #{dir}")
+end
