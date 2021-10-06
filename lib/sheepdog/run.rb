@@ -19,7 +19,7 @@ def sheepdog_ping(tag,r)
   event
 end
 
-def run(tag,cmd,verbose=false)
+def run(tag, cmd, verbose=false)
   starting = Process.clock_gettime(Process::CLOCK_MONOTONIC)
 
   print(cmd.green+"\n") if verbose
