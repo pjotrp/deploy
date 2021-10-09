@@ -78,11 +78,12 @@ repo = dir+"::"+options[:tag]+"-"+stamp
 cmd = "yes|borg create \""+repo+"\" "+ARGV.join(" ")
 
 cmd += " "+options[:args] if options[:args]
-runner.call("create",cmd)
+runner.call("backup",cmd)
 
 # ---- Try to set group permissions
 group = options[:group]
 if group
+  opts.always = false
   runner.call("chgrp","chgrp #{group} -R #{dir}")
   runner.call("chmod","chmod g+r -R #{dir}")
 end
