@@ -34,6 +34,7 @@ opts = get_options(opts,options, lambda { |opts,options|
                    })
 verbose = options[:verbose]
 filter = options[:filter]
+filter ||= options[:tag]
 
 r = redis_connect(opts)
 

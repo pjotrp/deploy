@@ -61,6 +61,7 @@ def get_options(opts, options, func = nil)
   end.parse!
 
   options[:config] = CONFIGFN
+  # options[:tag] ||= 'undefined'
   p options if options[:verbose]
 
   OpenStruct.new(options)
