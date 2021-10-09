@@ -1,8 +1,26 @@
 require 'optparse'
 require 'ostruct'
 
+HOME=ENV['HOME']
+DEFAULT_CONFIGFN = HOME+"/.config/sheepdog/sheepdog.conf"
+CONFIGFN = if File.exist?(DEFAULT_CONFIGFN)
+             DEFAULT_CONFIGFN
+           else
+             HOME+"/.redis.conf" # support older version
+           end
+
+def get_config
+  config = if File.exist?(CONFIGFN)
+             $stderr.print("sheepdog loading configuration from #{CONFIGFN}...")
+             JSON.parse(File.read(CONFIGFN))
+           end
+  # config['HOME'] = HOME
+
+end
+
 def get_options(opts, options, func = nil)
-  options[:host] = CONFIG.keys.first if CONFIG
+  config = get_config()
+  options[:host] = config.keys.first if config
 
   OptionParser.new do |opts|
     opts.banner = "Usage: sheepdog_run.rg [options]"

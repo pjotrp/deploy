@@ -1,26 +1,15 @@
 require 'json'
 require 'redis'
 require 'colorize'
+require 'sheepdog/options'
 require 'sheepdog/email'
-
-HOME=ENV['HOME']
-DEFAULT_CONFIGFN = HOME+"/.config/sheepdog/sheepdog.conf"
-
-CONFIGFN = if File.exist?(DEFAULT_CONFIGFN)
-             DEFAULT_CONFIGFN
-           else
-             HOME+"/.redis.conf"
-           end
-CONFIG = if File.exist?(CONFIGFN)
-           JSON.parse(File.read(CONFIGFN))
-         end
-# CONFIG['HOME'] = HOME
 
 def redis_get_password(opts)
   redis_password = nil
-  if CONFIG and opts.host and not redis_password
-    if CONFIG.has_key?(opts.host)
-      redis_password = CONFIG[opts.host]['password']
+  config = get_config()
+  if config and opts.host and not redis_password
+    if config.has_key?(opts.host)
+      redis_password = config[opts.host]['password']
     end
   end
   redis_password
