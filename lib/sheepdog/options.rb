@@ -11,11 +11,13 @@ CONFIGFN = if File.exist?(DEFAULT_CONFIGFN)
 
 def get_config
   config = if File.exist?(CONFIGFN)
-             $stderr.print("sheepdog loading configuration from #{CONFIGFN}...")
              JSON.parse(File.read(CONFIGFN))
            end
-  # config['HOME'] = HOME
-
+  config['HOME'] = HOME
+  if config
+    config['config'] = CONFIGFN
+  end
+  config
 end
 
 def get_options(opts, options, func = nil)

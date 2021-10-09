@@ -18,21 +18,22 @@ end
 def redis_connect(opts)
   redis_password = redis_get_password(opts)
   r = Redis.new(host: opts.host, port: opts.port, password: redis_password)
-  return nil if not redis_ping(r)
+  return nil if not redis_ping(r,opts)
   r
 end
 
-def redis_ping(r)
+def redis_ping(r,opts)
+  host = opts[:host]
   begin
     r.ping()
   rescue Redis::CannotConnectError
-    warning("redis is not connecting")
+    warning("redis on #{host} is not connecting")
     return false
   rescue  Redis::CommandError
-    warning("redis password error")
+    warning("redis on #{host} password error")
     return false
   rescue Redis::ConnectionError
-    warning("redis connection error")
+    warning("redis on #{host} connection error")
     return false
   end
   true
