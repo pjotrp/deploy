@@ -84,6 +84,11 @@ runner.call("backup",cmd)
 group = options[:group]
 if group
   opts.always = false
+  # 20 10,22 * * * /bin/chgrp ibackup -R /export/backup/borg
+  # 20 10,22 * * * /usr/bin/find /export/backup/borg -type d -exec chmod g+rx "{}" \;
+  # 20 10,22 * * * /usr/bin/find /export/backup/borg -exec chmod g+r "{}" \;
+
   runner.call("chgrp","chgrp #{group} -R #{dir}")
   runner.call("chmod","chmod g+r -R #{dir}")
+  runner.call("chmod",'/usr/bin/find '+dir+' -type d -exec chmod g+rx "{}" \;')
 end

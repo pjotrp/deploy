@@ -13,8 +13,8 @@ def get_config
   config = if File.exist?(CONFIGFN)
              JSON.parse(File.read(CONFIGFN))
            end
-  config['HOME'] = HOME
   if config
+    config['HOME'] = HOME
     config['config'] = CONFIGFN
   end
   config
