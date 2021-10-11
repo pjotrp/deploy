@@ -42,14 +42,18 @@ end
 def redis_report(r, event, opts, filter = nil)
   verbose = opts[:verbose]
   select = lambda do |buf|
-    lines = buf.split("\n")
-    if lines.length > 5
-      lines = filter.call(lines) if filter
-      if not opts[:full_output]
-        lines = [[lines.slice(0,2),"(...)"]+lines.slice(-3,3)]
+    if buf
+      lines = buf.split("\n")
+      if lines.length > 5
+        lines = filter.call(lines) if filter
+        if not opts[:full_output]
+          lines = [[lines.slice(0,2),"(...)"]+lines.slice(-3,3)]
+        end
       end
+      lines.join("\n")
+    else
+      ""
     end
-    lines.join("\n")
   end
   channel = "sheepdog:"+opts.channel
   id = channel
@@ -81,5 +85,9 @@ def redis_report(r, event, opts, filter = nil)
     puts("Sending E-mail to #{opts.email}".green)
     msg = "Subject: sheepdog failed!\n\n"+json+"\n"
     send_mail(opts.email,msg)
+  end
+  if event[:status] != 0
+    puts("Bailing out <#{id}>".red) if verbose
+    exit 1
   end
 end
