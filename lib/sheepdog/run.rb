@@ -22,15 +22,28 @@ end
 # Run a command and return an event
 def run(tag, cmd, verbose=false)
   starting = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  stdout = ""
 
-  print(cmd.green+"\n") if verbose
-  begin
-    stdout, stderr, status = Open3.capture3(cmd)
-    errval = status.exitstatus
-  rescue Errno::ENOENT
-    stderr = "Command not found"
-    err    = "CMD_NOT_FOUND"
+  tag = cmd.gsub(/[\s"']+/,"") if not tag
+  lockfn = ENV['HOME']+"/."+tag+".sheepdog.lck"
+  if File.exist?(lockfn)
+    stderr = "Can not steal #{lockfn}"
+    err = "LOCKED"
     errval = 1
+  else
+    File.open(lockfn, File::RDWR|File::CREAT, 0644) do |f|
+      f.flock(File::LOCK_EX)
+      print(cmd.green+"\n") if verbose
+      begin
+        stdout, stderr, status = Open3.capture3(cmd)
+        errval = status.exitstatus
+      rescue Errno::ENOENT
+        stderr = "Command not found"
+        err    = "CMD_NOT_FOUND"
+        errval = 1
+      end
+    end
+    File.unlink(lockfn)
   end
 
   ending = Process.clock_gettime(Process::CLOCK_MONOTONIC)

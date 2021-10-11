@@ -207,6 +207,8 @@ message queue and that can be overridden with the `--host` switch.
 
 ## Locking
 
+We have a lock command which will check a lock file using the tag name.
+
 sheepdog_rsync command has an option for using borg locks.
 
 # Extra info
