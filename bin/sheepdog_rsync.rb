@@ -24,6 +24,9 @@ opts = get_options(opts,options, lambda { |opts,options|
                      opts.on("--args rsync-args", "Extra arguments - e.g. --stats") do |a|
                        options[:args] = a
                      end
+                     opts.on("--lock-borg", "Use borg with-lock") do |b|
+                       options[:lock_borg] = true
+                     end
                    })
 
 files = ARGV
@@ -38,6 +41,8 @@ stamp = Time.now.strftime("%Y%m%d-%H:%M-%a")
 cmd = "rsync -rt"
 cmd += " "+options[:args] if options[:args]
 cmd += " "+files.join(" ")+" "+destdir
+
+cmd = "borg with-lock "+cmd if options[:lock_borg]
 
 event = run(options[:tag],cmd,options[:verbose])
 

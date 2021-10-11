@@ -205,6 +205,10 @@ undefined. When you specify a host on the command line it will send a
 message to that host using the password. Here, hostname will be the default
 message queue and that can be overridden with the `--host` switch.
 
+## Locking
+
+sheepdog_rsync command has an option for using borg locks.
+
 # Extra info
 
 ## Developing a new notification service
