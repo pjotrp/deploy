@@ -37,6 +37,7 @@ filter = options[:filter]
 filter ||= options[:tag]
 
 r = redis_connect(opts)
+exit 1 if not r
 
 channel = "sheepdog:"+opts.channel
 
