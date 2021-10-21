@@ -39,9 +39,10 @@ error("Missing --backup directory") if not dir
 if Process.uid == 0
   if File.stat(dir).mode != 040700
     p File.stat(dir)
-    error(dir+" has wrong permission! Set: chmod 0700 "+dir)
+    error("Backup dir #{dir} has wrong permission! Set: chmod 0700 "+dir)
   end
 end
+error("Backup dir #{dir} is a symlink") if File.symlink?(dir)
 
 r = redis_connect(opts)
 
