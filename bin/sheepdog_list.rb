@@ -56,7 +56,7 @@ r.smembers(channel).sort.each_with_index do | buf,i |
         else
           e.command
         end
-  status[tag] = {time: e.time, user: (e.user?e.user:""), host: e.host, status: e.err}
+  status[tag] = {time: e.time, user: (e.methods.include?(:user) ? e.user : ""), host: e.host, status: e.err}
   if e.elapsed
     min = sprintf("%.2d",e.elapsed/60)
     sec = sprintf("%.2d",e.elapsed % 60)
