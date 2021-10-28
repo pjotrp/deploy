@@ -26,7 +26,7 @@ def run(tag, cmd, verbose=false)
   stdout = ""
 
   tag = cmd.gsub(/[\s"']+/,"") if not tag
-  lockfn = ENV['HOME']+"/."+tag+".sheepdog.lck"
+  lockfn = ENV['HOME']+"/."+tag.gsub("/","-")+".sheepdog.lck"
   if File.exist?(lockfn)
     stderr = "Can not steal #{lockfn}"
     err = "LOCKED"
