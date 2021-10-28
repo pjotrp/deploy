@@ -56,7 +56,7 @@ r.smembers(channel).sort.each_with_index do | buf,i |
         else
           e.command
         end
-  status[tag] = {time: e.time, host: e.host, status: e.err}
+  status[tag] = {time: e.time, user: (e.user?e.user:""), host: e.host, status: e.err}
   if e.elapsed
     min = sprintf("%.2d",e.elapsed/60)
     sec = sprintf("%.2d",e.elapsed % 60)
@@ -83,7 +83,7 @@ r.smembers(channel).sort.each_with_index do | buf,i |
     end
     print(event.to_s.green,"\n")
   else
-    print("#{e.time} (#{e.host}) #{e.err} #{e.status} <#{min}m#{sec}s> #{tag}")
+    print("#{e.time} (#{e.user}@#{e.host}) #{e.err} #{e.status} <#{min}m#{sec}s> #{tag}")
     print("\n")
   end
 end
