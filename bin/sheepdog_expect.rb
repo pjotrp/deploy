@@ -71,6 +71,7 @@ if status>0
   event = {
     time: Time.now().to_s,
     elapsed: 0,
+    user: ENV['USER'],
     host: Socket.gethostname,
     command: filter,
     tag: tag,
