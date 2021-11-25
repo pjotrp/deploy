@@ -26,28 +26,28 @@ def run(tag, cmd, verbose=false)
   stdout = ""
 
   tag = cmd.gsub(/[\s"']+/,"") if not tag
-  lockfn = ENV['HOME']+"/."+tag.gsub("/","-")+".sheepdog.lck"
-  if File.exist?(lockfn)
-    stderr = "Can not steal #{lockfn}"
-    err = "LOCKED"
-    errval = 1
-  else
-    File.open(lockfn, File::RDWR|File::CREAT, 0644) do |f|
-      f.flock(File::LOCK_EX)
-      print(cmd.green+"\n") if verbose
-      begin
-        stdout, stderr, status = Open3.capture3(cmd)
-        errval = status.exitstatus
-      rescue Errno::ENOENT
-        stderr = "Command not found"
-        err    = "CMD_NOT_FOUND"
-        errval = 1
+  lockname = tag.gsub("/","-")+".sheepdog"
+
+  begin
+    if Lock.create(lockname) # this will wait for a lock to expire
+      File.open(lockfn, File::RDWR|File::CREAT, 0644) do |f|
+        f.flock(File::LOCK_EX)
+        print(cmd.green+"\n") if verbose
+        begin
+          stdout, stderr, status = Open3.capture3(cmd)
+          errval = status.exitstatus
+        rescue Errno::ENOENT
+          stderr = "Command not found"
+          err    = "CMD_NOT_FOUND"
+          errval = 1
+        end
+      ensure
+        Lock.release(lockname)
       end
-    end
-    begin
-      File.unlink(lockfn)
-    rescue Errno::ENOENT
-      # ignore if file has gone away
+    else
+      stderr = "Lock error"
+      err    = "LOCKED"
+      errval = 1
     end
   end
 
