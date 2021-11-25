@@ -44,7 +44,11 @@ def run(tag, cmd, verbose=false)
         errval = 1
       end
     end
-    File.unlink(lockfn)
+    begin
+      File.unlink(lockfn)
+    rescue Errno::ENOENT
+      # ignore if file has gone away
+    end
   end
 
   ending = Process.clock_gettime(Process::CLOCK_MONOTONIC)
