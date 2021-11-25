@@ -31,25 +31,22 @@ def run(tag, cmd, verbose=false)
 
   begin
     if Lock.create(lockname) # this will wait for a lock to expire
-      File.open(lockfn, File::RDWR|File::CREAT, 0644) do |f|
-        f.flock(File::LOCK_EX)
-        print(cmd.green+"\n") if verbose
-        begin
-          stdout, stderr, status = Open3.capture3(cmd)
-          errval = status.exitstatus
-        rescue Errno::ENOENT
-          stderr = "Command not found"
-          err    = "CMD_NOT_FOUND"
-          errval = 1
-        end
-      ensure
-        Lock.release(lockname)
+      print(cmd.green+"\n") if verbose
+      begin
+        stdout, stderr, status = Open3.capture3(cmd)
+        errval = status.exitstatus
+      rescue Errno::ENOENT
+        stderr = "Command not found"
+        err    = "CMD_NOT_FOUND"
+        errval = 1
       end
     else
       stderr = "Lock error"
       err    = "LOCKED"
       errval = 1
     end
+  ensure
+    Lock.release(lockname)
   end
 
   ending = Process.clock_gettime(Process::CLOCK_MONOTONIC)
