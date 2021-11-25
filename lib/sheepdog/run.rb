@@ -1,5 +1,6 @@
 require 'open3'
 require 'colorize'
+require 'lock'
 
 def sheepdog_ping(tag,r)
   ok = redis_ping(r)
