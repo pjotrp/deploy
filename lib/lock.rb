@@ -90,7 +90,9 @@ module Lock
         # ignore error when the lock file went missing
       end
     else
-      $stderr.print "\nERROR: can not release #{lockfn} because it is not owned by me"
+      # $stderr.print "\nERROR: can not release #{lockfn} because it is not owned by me"
+      # Ignore. Normally another process immediately grabs our lock - if there is contention
+      # we will see above 'waiting for lock' messages
     end
   end
 
