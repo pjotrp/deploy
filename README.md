@@ -6,42 +6,21 @@ common workflow langauge (CWL) essentially a replacement for Puppet,
 Chef, Cfengine, Cfruby, GNU stow, etc.  See the doc/design.org
 document for more.
 
-deploy now comes with the `sheepdog`: a minimalist monitor and
-notification system.
+The tooling comes with the `sheepdog`: a minimalist monitor and notification system.
+The purpose of `sheepdog' is to monitor problems in hardware and software on a larger setup.
+Events, such as a succeeding or failing backup, get pushed onto a message queue for later digestion.
 
-Historic note: at the time of Cfruby I decided that Cfruby was to be
-one of my last `large' software projects.  How these things come to
-haunt you! Cfruby is showing its age and now Deploy is bound to be a
-large project, again. Well, maybe not, if I keep it minimalistic.
+Important notice: much of the work on deploy has been superceded by Guix and Guix home!
 
-More information can be found in the
-[design document](https://github.com/pjotrp/deploy/blob/master/doc/design.org).
+=> https://guix.gnu.org/manual/devel/en/html_node/Home-Configuration.html
 
-Even though it is early days for deploy and sheepdog we use it every
-day in production environments. YMMV.
+What remains is our faithful `sheepdog' to generate monitoring events and tools to process them.
 
-Pjotr Prins (c) 2015-2021
-
-# Implementation (JIT)
-
-Deploy is developed in JIT fashion. First steps are:
-
-1. Get machine status (hostname, username, homedir) (done)
-2. Read command file (done)
-3. Implement mkdir (done)
-4. Implement (recursive) file copy (done)
-5. Implement intermediate data 'bag' format (done)
-6. Implement (simple) file edit (done)
-7. Expand recursive file copy and file permissions (in progress)
-
-Sorry, initially, no transactions, parallelization, fancy error
-reporting etc. Use GNU Guix properly for doing deployment right! At
-this stage I have started using deploy for machine management. Cfruby
-is being phased out.
+Pjotr Prins (c) 2015-2022
 
 ## TODO
 
-- https://github.com/genenetwork/gn-gemtext-threads/blob/main/topics/systems/sheepdog.gmi
+=> https://issues.genenetwork.org/search?query=sheepdog&type=all
 
 # Sheepdog
 
@@ -49,14 +28,18 @@ Sheepdog is a tool for monitoring services. The idea is simple: use a
 wrapper script to capture output of, for example, a backup run. On
 error push a message out into a queue. The basic premises are:
 
-- Only notify on FAIL
+- Only notify on FAIL (by default)
 - Separation of concerns
 - Make debugging of scripts easy
 
-By default we use redis, but syslog and others may also be used. The
-advantage of redis is that it is not host bound and easy to query.
+By default we use redis, but syslog and others may also be used.
+The advantage of redis is that it is not bound to the same host, can cross firewalls using an ssh reverse tunnel, and is easy to query.
 
     ./bin/sheepdog_run.rb -v -c 'echo "HELLO WORLD"'
+
+To push a failing event
+
+    ./bin/sheepdog_run.rb -v -c 'false'
 
 To get the status, query with
 
@@ -86,6 +69,8 @@ Outputs a nicely colored and formatted:
     "err": "FAIL"
 }
 ```
+
+Note that the message queue contains fields for the time stamp, the executed command and stdout/stderr. These are important for trouble shooting down the line.
 
 Check jq out. It has a lot of powerful filters. To get the
 last status of services do

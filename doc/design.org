@@ -26,6 +26,10 @@
 
 * Introduction
 
+Important notice: much of this work has been superceded by Guix and Guix home!
+
+=> https://guix.gnu.org/manual/devel/en/html_node/Home-Configuration.html
+
 `deploy' is a deployment tool which operates in the same domain as
 Chef, Puppet, Cfengine and Cfruby. I have used all. Actually, I
 created Cfruby with David Powers many years ago, the start was
@@ -50,7 +54,7 @@ configuration will be in YAML (this time, sorry David Powers for
 ignoring your idea).
 
 Third, we want to be able to list properties of a machine. This means
-we have to have an intermediate representation. Something that Cfruby 
+we have to have an intermediate representation. Something that Cfruby
 misses and GNU Guix has.
 
 Fourth, we want fine grained output that can be configured. Cfruby
@@ -92,7 +96,7 @@ Configuration will be a compination of YAML and simple Ruby and/or
 Guile. Depending on needs and preferences. You can write deploy
 definitions with YAML and Ruby, YAML and Guile, or all three. Scripts
 can be written in any language. All `deploy' does is provide the
-framework. 
+framework.
 
 The basic framework is written in Ruby, the reason being that we have
 so much useful code already in Cfruby. In time, some of it may migrate
@@ -130,7 +134,7 @@ symlink (btw. the much older GNU Stow does something similar with
 symlinks).
 
 We will use GNU Guix for some stuff. So that is tactic one. Inside
-the reposititory there may be a ./guix directory containing 
+the reposititory there may be a ./guix directory containing
 definitions.
 
 Tactic two is to use the same symlink idea, but to implement it
@@ -142,7 +146,7 @@ Tactic four is to capture error conditions and roll back.
 
 Just as an example, I use stunnel which has a configuration file
 in /etc/stunnel/. With GNU Guix that file would be encoded and
-hosted inside the stunnel store path. Rather clean! 
+hosted inside the stunnel store path. Rather clean!
 
 If we were to use a symlink, we'll symlink from
 /etc/deploy/stunnel/stunnel-1 to /etc/stunnel, that would work too.
@@ -174,7 +178,7 @@ file copy. With file edits the actions are sorted by module name
 (unless an explicit dependency is defined) followed by occurance in
 the command file.
 
-** Modules 
+** Modules
 
 A module is an independent entity. For example configuring vim
 is independent of configuring emacs. A module is also a transaction.
@@ -212,7 +216,7 @@ Error levels should be:
 
 *** Fatal error
 
-Any error that breaks the install. 
+Any error that breaks the install.
 
 *** Error:  Non-fatal errors
 
@@ -223,7 +227,7 @@ line switch. Transactions is rolled back. Other modules continue.
 
 Just a warning.
 
-*** Debug 
+*** Debug
 
 Debug information.
 
@@ -255,7 +259,7 @@ Once Guix is running update Guix
 
 and now we need guix, guile, ruby and git to run deploy
 
-: guix package -i guix guile ruby git 
+: guix package -i guix guile ruby git
 
 and set the path:
 
@@ -279,7 +283,7 @@ And you should be able to run
 
 The first step is to set up a git repository to store the
 definition. Here we are going to set up two examples, one for a server
-installation and one for a HOME directory. Unsurprisingly 
+installation and one for a HOME directory. Unsurprisingly
 I use both.
 
 ** Classes
@@ -338,7 +342,7 @@ in the repository/config/*.yaml
 
 ** Master files
 
-The convention for masterfiles is that they are relative to 
+The convention for masterfiles is that they are relative to
 repository/masterfiles/module/. If that module dir is missing the
 masterfiles are simply relative to repository/masterfiles/.
 
@@ -393,7 +397,7 @@ We define a class named sshd in classes.yaml containing myhost01:
 sshd: myhost01
 #+END_EXAMPLE
 
-This means when running the ssh module on myhost01 we want it to 
+This means when running the ssh module on myhost01 we want it to
 install, otherwise skip. Now the ssh.yaml should be something like
 
 #+BEGIN_EXAMPLE
@@ -534,4 +538,3 @@ appropriate permissions.
 A future version of `deploy' will actually create a versioned
 directory in /etc/deploy/vpnc/vpn-1/ and symlink to that to ascertain
 transactions and allow for roll-backs.
-
