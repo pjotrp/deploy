@@ -67,4 +67,4 @@
           (string-append "Resource not found: "
                          (uri->string (request-uri request)))))
 
-(run-server hello-world-handler)
+(run-server hello-world-handler 'http '(#:port 8091))
