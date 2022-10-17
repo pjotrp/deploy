@@ -1,5 +1,5 @@
-#!/usr/bin/env guile
--s
+#!/usr/bin/env guile \
+-e main -s
 !#
 ;; Minimal web server can be started from command line. Current routes:
 ;;
@@ -36,8 +36,8 @@
 (define (status-line rec)
   (string-append
    (cdr (assoc "time" rec)) "\t"
-   (cdr (assoc "host" rec)) "\t"
    (cdr (assoc "err" rec)) "\t"
+   (cdr (assoc "host" rec)) "\t"
    (cdr (assoc "tag" rec)) "\t"
    (cdr (assoc "command" rec))
    ))
@@ -67,4 +67,11 @@
           (string-append "Resource not found: "
                          (uri->string (request-uri request)))))
 
-(run-server hello-world-handler 'http '(#:port 8091))
+(define (main args)
+  (write "Starting web server!")
+  (write args)
+  (newline)
+  (let ((listen (inexact->exact (string->number (car (cdr args))))))
+    (display "listening on 8119")
+    ;; (write listen)
+    (run-server hello-world-handler 'http '(#:port 8119))))
