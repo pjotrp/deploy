@@ -52,6 +52,9 @@ def get_options(opts, options, func = nil)
     opts.on("--full", "Show full output (no stripping)") do |b|
       options[:full_output] = b
     end
+    opts.on("--store-stdout", "Store stdout (default NO)") do |b|
+      options[:store_stdout] = b
+    end
     opts.on("-v", "--[no-]verbose", "Run verbosely (--no-verbose is quiet mode)") do |v|
       options[:verbose] = v
     end
