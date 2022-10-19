@@ -55,7 +55,7 @@ def redis_report(r, event, opts, filter = nil)
       ""
     end
   end
-  channel = "sheepdog:"+opts.channel
+  channel = "sheepdog_"+opts.channel
   id = channel
 
   if opts.always or event[:status] != 0
@@ -74,7 +74,7 @@ def redis_report(r, event, opts, filter = nil)
       puts("redis: can not write event to queue".green)
       return
     else
-      r.sadd(id,json)
+      r.lpush(id,json)
     end
     if opts.log
       File.open(opts.log,"a") { |f| f.print(json,",\n") }

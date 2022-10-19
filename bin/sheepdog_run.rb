@@ -7,7 +7,7 @@
 #
 # To view members you can run redis-cli with
 #
-#   redis-cli  Smembers sheepdog:run
+#   redis-cli LRANGE sheepdog_run 0 -1
 #
 # or use sheepdog_list.rb
 
@@ -31,6 +31,6 @@ opts = get_options(opts,options, lambda { |opts,options|
 
 r = redis_connect(opts)
 
-event = run(opts.tag,opts.cmd)
+event = run(opts.tag,opts.cmd,opts.store_stdout,opts.verbose)
 
 redis_report(r,event,opts)

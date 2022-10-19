@@ -167,8 +167,8 @@ Because we use redis we can use the following commands:
 
 ```
 redis-cli
-KEYS sheepdog:*
-DEL sheepdog:run
+KEYS sheepdog_*
+DEL sheepdog_run
 ```
 
 ## Using passwords

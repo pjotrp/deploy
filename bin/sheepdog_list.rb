@@ -39,12 +39,12 @@ filter ||= options[:tag]
 r = redis_connect(opts)
 exit 1 if not r
 
-channel = "sheepdog:"+opts.channel
+channel = "sheepdog_"+opts.channel
 
 status = {}
 
 print("[") if opts.json
-r.smembers(channel).sort.each_with_index do | buf,i |
+r.lrange(channel,0,-1).sort.each_with_index do | buf,i |
   begin
     event = JSON::parse(buf)
     e = OpenStruct.new(event)
@@ -90,7 +90,7 @@ end
 if opts.json
   print("]")
 else
-  puts("For more info try: redis-cli  Smembers sheepdog:run") if verbose
+  puts("For more info try: redis-cli  Smembers sheepdog_run") if verbose
 end
 
 if opts.status

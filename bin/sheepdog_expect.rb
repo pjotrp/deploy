@@ -45,7 +45,7 @@ elapse =
 
 r = redis_connect(opts)
 
-channel = "sheepdog:"+opts.channel
+channel = "sheepdog_"+opts.channel
 
 status = 1
 
