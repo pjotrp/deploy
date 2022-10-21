@@ -37,21 +37,14 @@
   (let ((l (get-status-as-scm))
         (nlist '()))
     (map (lambda (rec)
-           (let* ((str (cdr (assoc "command" rec)))
-                  (found (assoc str nlist)))
-             (if (not found)
-                 ((set! nlist (assoc-set! nlist str #t))
-                 rec)
-                 #f
-                 ))) l )))
-
-(define (filter-last-states2)
-  (let ((l (get-status-as-scm))
-        (nlist '()))
-    (map (lambda (rec)
-           (let ((tag (cdr (assoc "command" rec))))
+           (let* ((tag (cdr (assoc "command" rec)))
+                  (found (assoc tag nlist)
+                         ))
              (set! nlist (assoc-set! nlist tag #t))
-             tag)
+             (if found
+                 #f
+                 rec)
+             )
            ) l)))
 
 (define (status-line rec)
@@ -68,7 +61,9 @@
     (string-append "<pre>"
                    (string-join (map (lambda (rec)
                                        (if rec
-                                           (status-line rec))) l) "\n")
+                                           (status-line rec)
+                                           ""
+                                           )) l) "\n")
                    "</pre>")))
 
 (define (hello-world-handler request body)
