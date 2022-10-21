@@ -31,6 +31,6 @@ opts = get_options(opts,options, lambda { |opts,options|
 
 r = redis_connect(opts)
 
-event = run(opts.tag,opts.cmd,opts.store_stdout,opts.verbose)
+event = run(opts.tag,opts.cmd,opts.verbose)
 
 redis_report(r,event,opts)
