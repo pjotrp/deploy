@@ -21,7 +21,7 @@
 (define (get-status-as-json-string-list)
   ;; return a list of strings containing json records
   (let* ((conn (redis-connect))
-         (sorted-list (sort-list (redis-send conn (smembers '("sheepdog_run"))) string>)))
+         (sorted-list (sort-list (redis-send conn (lrange '("sheepdog_run" -100 -1))) string>)))
     (redis-close conn)
     sorted-list
      ))
