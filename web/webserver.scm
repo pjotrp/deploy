@@ -61,9 +61,9 @@
     (string-append "<pre>"
                    (string-join (map (lambda (rec)
                                        (if rec
-                                           (status-line rec)
+                                           (string-append (status-line rec) "\n")
                                            ""
-                                           )) l) "\n")
+                                           )) l) "")
                    "</pre>")))
 
 (define (hello-world-handler request body)
