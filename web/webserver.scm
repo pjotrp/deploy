@@ -21,7 +21,7 @@
 (define (get-status-as-json-string-list)
   ;; return a list of strings containing json records
   (let* ((conn (redis-connect))
-         (sorted-list (redis-send conn (lrange '("sheepdog_run" -1000 -1)))))
+         (sorted-list (redis-send conn (lrange '("sheepdog_run" 0 1000)))))
     (redis-close conn)
     sorted-list
      ))
@@ -37,10 +37,10 @@
   (let ((l (get-status-as-scm))
         (nlist '()))
     (map (lambda (rec)
-           (let* ((tag (cdr (assoc "command" rec)))
-                  (found (assoc tag nlist)
-                         ))
-             (set! nlist (assoc-set! nlist tag #t))
+           (let* ((tag (string-append (cdr (assoc "host" rec)) (cdr (assoc "command" rec))))
+                  (found (assoc tag nlist)))
+             (if (not found)
+                 (set! nlist (assoc-set! nlist tag #t)))
              (if found
                  #f
                  rec)
