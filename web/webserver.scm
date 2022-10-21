@@ -33,6 +33,27 @@
   (let ((js get-status-as-json-string-list))
     (map json-string->scm (get-status-as-json-string-list))))
 
+(define (filter-last-states)
+  (let ((l (get-status-as-scm))
+        (nlist '()))
+    (map (lambda (rec)
+           (let* ((str (cdr (assoc "command" rec)))
+                  (found (assoc str nlist)))
+             (if (not found)
+                 ((set! nlist (assoc-set! nlist str #t))
+                 rec)
+                 #f
+                 ))) l )))
+
+(define (filter-last-states2)
+  (let ((l (get-status-as-scm))
+        (nlist '()))
+    (map (lambda (rec)
+           (let ((tag (cdr (assoc "command" rec))))
+             (set! nlist (assoc-set! nlist tag #t))
+             tag)
+           ) l)))
+
 (define (status-line rec)
   (string-append
    (cdr (assoc "time" rec)) "\t"
@@ -43,9 +64,11 @@
    ))
 
 (define (get-status-as-html)
-  (let ((l (get-status-as-scm)))
+  (let ((l (filter-last-states)))
     (string-append "<pre>"
-                   (string-join (map (lambda (rec) (status-line rec)) l) "\n")
+                   (string-join (map (lambda (rec)
+                                       (if rec
+                                           (status-line rec))) l) "\n")
                    "</pre>")))
 
 (define (hello-world-handler request body)
