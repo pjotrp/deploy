@@ -1,0 +1,11 @@
+<html>
+  <head>
+  <title>Sheepdog status updates</title>
+  </head>
+  <body>
+    <h1>Sheepdog status</h1>
+    <script src="htmx.min.js"></script>
+    <div hx-get="/status.html" hx-trigger="load delay:600ms">
+    </div>
+  </body>
+</html>

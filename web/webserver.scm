@@ -15,6 +15,10 @@
              (web response)
              (web uri))
 
+(use-modules (ice-9 textual-ports))
+
+;; ---- sheepdog queries
+
 (define (request-path-components request)
   (split-and-decode-uri-path (uri-path (request-uri request))))
 
@@ -58,13 +62,19 @@
 
 (define (get-status-as-html)
   (let ((l (filter-last-states)))
-    (string-append "<pre>"
-                   (string-join (map (lambda (rec)
-                                       (if rec
-                                           (string-append (status-line rec) "\n")
-                                           ""
-                                           )) l) "")
-                   "</pre>")))
+    (string-append
+     "<div hx-target=\"this\" hx-get=\"/status.html\" hx-trigger=\"load delay:60000ms\" hx-swap=\"outerHTML\">"
+     "<pre>"
+     (strftime "%Y-%m-%d %H:%M:%S %z" (localtime (current-time)))
+     "\tpage loaded @time (updating every minute)\n"
+     (string-join (map (lambda (rec)
+                         (if rec
+                             (string-append (status-line rec) "\n")
+                             ""
+                             )) l) "")
+     "</pre></div>")))
+
+;; ---- web server handler
 
 (define (hello-world-handler request body)
   (let ((path (uri-path (request-uri request))))
@@ -77,6 +87,16 @@
       (values '((content-type . (text/html)))
               (get-status-as-html)
               ))
+     ((member path (list "/index.html"))
+      (values '((content-type . (text/html)))
+              (call-with-input-file "static/index.html"
+                             (lambda (port)
+                               (get-string-all port)))))
+     ((member path (list "/htmx.min.js"))
+      (values '((content-type . (text/javascript)))
+              (call-with-input-file "static/htmx.min.js"
+                             (lambda (port)
+                               (get-string-all port)))))
      (else
       (not-found request)))))
 
