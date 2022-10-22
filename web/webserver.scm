@@ -63,7 +63,7 @@
 (define (get-status-as-html)
   (let ((l (filter-last-states)))
     (string-append
-     "<div hx-target=\"this\" hx-get=\"/status.html\" hx-trigger=\"load delay:60000ms\" hx-swap=\"outerHTML\">"
+     "<div hx-target=\"this\" hx-get=\"status.html\" hx-trigger=\"load delay:60000ms\" hx-swap=\"outerHTML\">"
      "<pre>"
      (strftime "%Y-%m-%d %H:%M:%S %z" (localtime (current-time)))
      "\tpage loaded @time (updating every minute)\n"
@@ -79,20 +79,20 @@
 (define (hello-world-handler request body)
   (let ((path (uri-path (request-uri request))))
     (cond
-     ((member path (list "/status.json"))
+     ((member path (list "/sheepdog/status.json"))
       (values '((content-type . (application/json)))
               (get-status-as-single-json-string)
               ))
-     ((member path (list "/status.html"))
+     ((member path (list "/sheepdog/status.html"))
       (values '((content-type . (text/html)))
               (get-status-as-html)
               ))
-     ((member path (list "/index.html"))
+     ((member path (list "/sheepdog/index.html"))
       (values '((content-type . (text/html)))
               (call-with-input-file "static/index.html"
                              (lambda (port)
                                (get-string-all port)))))
-     ((member path (list "/htmx.min.js"))
+     ((member path (list "/sheepdog/htmx.min.js"))
       (values '((content-type . (text/javascript)))
               (call-with-input-file "static/htmx.min.js"
                              (lambda (port)
