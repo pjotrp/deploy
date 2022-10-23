@@ -48,7 +48,7 @@
   (let ((l (get-status-as-scm))
         (nlist '()))
     (map (lambda (rec)
-           (let* ((tag (string-append (cdr (assoc "host" rec)) (cdr (assoc "command" rec))))
+           (let* ((tag (string-append (cdr (assoc "host" rec)) (cdr (assoc "tag" rec))))
                   (found (assoc tag nlist)))
              (if (not found)
                  (set! nlist (assoc-set! nlist tag #t)))
@@ -63,8 +63,8 @@
    (cdr (assoc "time" rec)) "\t"
    (cdr (assoc "err" rec)) "\t"
    (cdr (assoc "host" rec)) "\t"
-   (cdr (assoc "tag" rec)) "\t"
-   (cdr (assoc "command" rec))
+   (cdr (assoc "tag" rec))
+   ;; (cdr (assoc "command" rec))
    ))
 
 (define (get-status-as-html)
