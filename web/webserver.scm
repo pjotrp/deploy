@@ -22,10 +22,17 @@
 (define (request-path-components request)
   (split-and-decode-uri-path (uri-path (request-uri request))))
 
+(define get-config-password
+  (cdr (assoc "password" (cdr (assoc "redis"
+              (json-string->scm
+               (call-with-input-file (string-append (getenv "HOME") "/.config/sheepdog/sheepdog.conf")
+                 (lambda (port)
+                   (get-string-all port)))))))))
+
 (define (get-status-as-json-string-list)
   ;; return a list of strings containing json records
   (let* ((conn (redis-connect))
-         (sorted-list (and (redis-send conn (auth '("123456"))) (redis-send conn (lrange '("sheepdog_run" 0 1000))))))
+         (sorted-list (and (redis-send conn (auth (list get-config-password))) (redis-send conn (lrange '("sheepdog_run" 0 1000))))))
     (redis-close conn)
     sorted-list
      ))
