@@ -4,20 +4,8 @@ require 'colorize'
 require 'sheepdog/options'
 require 'sheepdog/email'
 
-def redis_get_password(opts)
-  redis_password = nil
-  config = get_config()
-  if config and opts.host and not redis_password
-    if config.has_key?(opts.host)
-      redis_password = config[opts.host]['password']
-    end
-  end
-  redis_password
-end
-
 def redis_connect(opts)
-  redis_password = redis_get_password(opts)
-  r = Redis.new(host: opts.host, port: opts.port, password: redis_password)
+  r = Redis.new(host: opts.host, port: opts.port, password: opts.password)
   return nil if not redis_ping(r,opts)
   r
 end

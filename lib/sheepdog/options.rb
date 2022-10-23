@@ -2,10 +2,14 @@ require 'optparse'
 require 'ostruct'
 
 HOME=ENV['HOME']
-DEFAULT_CONFIGFN = HOME+"/.config/sheepdog/sheepdog.conf"
+DEFAULT_CONFIGFN  = HOME+"/.config/sheepdog/sheepdog.conf"
+OBSOLETE_CONFIGFN = HOME+"/.redis.conf"
 CONFIGFN = if File.exist?(DEFAULT_CONFIGFN)
              DEFAULT_CONFIGFN
            else
+             if File.exist?(OBSOLETE_CONFIGFN)
+               warning("Using obsolete config file - use #{DEFAULT_CONFIGFN} instead")
+             end
              HOME+"/.redis.conf" # support older version
            end
 
@@ -22,7 +26,11 @@ end
 
 def get_options(opts, options, func = nil)
   config = get_config()
-  options[:host] = config.keys.first if config
+  if config
+    redis = config['redis']
+    options[:host] = redis["host"]
+    options[:password] = redis["password"]
+  end
 
   OptionParser.new do |opts|
     opts.banner = "Usage: sheepdog_run.rg [options]"
@@ -37,7 +45,7 @@ def get_options(opts, options, func = nil)
       options[:port] = port
     end
     opts.on("--password str", "Attach to redis with password") do |pwd|
-      redis_password = pwd
+      options[:password] = pwd
     end
     opts.on("-t", "--tag tag", "Set message tag") do |tag|
       options[:tag] = tag

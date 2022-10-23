@@ -179,8 +179,9 @@ command line with `--password` or set in a file
 
 ```js
 {
-  "hostname": {
-     "password": "****"
+  "redis": {
+    "host"  : "localhost",
+    "password": "123456"
   }
 }
 ```
