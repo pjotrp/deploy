@@ -181,7 +181,7 @@ command line with `--password` or set in a file
 {
   "redis": {
     "host"  : "localhost",
-    "port" : "6379",
+    "port" : 6379,
     "password": "123456"
   }
 }

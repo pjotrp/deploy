@@ -29,6 +29,7 @@ def get_options(opts, options, func = nil)
   if config
     redis = config['redis']
     options[:host] = redis["host"]
+    options[:port] = redis["port"]
     options[:password] = redis["password"]
   end
 
