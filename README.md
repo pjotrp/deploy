@@ -33,7 +33,7 @@ error push a message out into a queue. The basic premises are:
 - Make debugging of scripts easy
 
 By default we use redis, but syslog and others may also be used.
-The advantage of redis is that it is not bound to the same host, can cross firewalls using an ssh reverse tunnel, and is easy to query.
+The advantage of redis is that it is not bound to the same host, can cross firewalls using an ssh reverse tunnel (see below), and is easy to query.
 
     ./bin/sheepdog_run.rb -v -c 'echo "HELLO WORLD"'
 
@@ -181,6 +181,7 @@ command line with `--password` or set in a file
 {
   "redis": {
     "host"  : "localhost",
+    "port" : "6379",
     "password": "123456"
   }
 }
@@ -253,6 +254,44 @@ PATH=/home/wrk/iwrk/deploy/deploy/bin:/home/wrk/opt/deploy/bin:/bin:/usr/bin
 Note that the redirection only for stuff not captured by sheepdog. It
 is rare to look into those outputs. If you leave it out CRON may try
 to send an E-mail on any output.
+
+## REDIS reverse tunnel
+
+Sometimes a redis queue is not directly reachable because it is inside a firewall. If the sheepdog machine can be reachead from the redis machine we can set up a reverse tunnel with ssh. That requires a password-less key and therefore we should give that user limited rights. On the machine running sheepdog create a user that has no shell access:
+
+```
+useradd redis-tun -m -s /bin/true
+```
+
+In /etc/ssh/sshd.conf set up
+
+```
+Match User redis-tun
+  PermitOpen 127.0.0.1:6379
+  X11Forwarding no
+  AllowAgentForwarding no
+  ForceCommand /bin/false
+```
+
+Now make sure the ssh key is on the redis host and
+
+```
+/usr/bin/ssh -i key -f -N -R 6377:localhost:6379 redis-tun@sheepdoghost
+```
+
+Next you should be able to connect with
+
+```
+redis-cli -p 6377
+```
+
+And update sheepdog.conf accordingly
+
+A CRON entry may look like
+
+```
+3 * * * * /usr/bin/ssh -i key -f -N -R 6377:localhost:6379 redis-tun@sheepdoghost >> tunnel.log &2>1
+```
 
 # Check for connections
 
