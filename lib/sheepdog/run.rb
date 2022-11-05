@@ -3,14 +3,15 @@ require 'colorize'
 require 'lock'
 
 def sheepdog_ping(tag,r)
-  ok = redis_ping(r)
+  host = Socket.gethostname
+  ok = redis_ping(r,host)
 
   errval = !ok
   event = {
     time: Time.new.to_s,
     elapsed: 0,
     user: ENV['USER'],
-    host: Socket.gethostname, # sending host
+    host: host, # sending host
     command: 'sheepdog_ping.rb',
     tag: tag,
     stdout: "",

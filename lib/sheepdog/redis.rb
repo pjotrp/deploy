@@ -10,8 +10,7 @@ def redis_connect(opts)
   r
 end
 
-def redis_ping(r,opts)
-  host = opts[:host]
+def redis_ping(r,host)
   begin
     r.ping()
   rescue Redis::CannotConnectError
