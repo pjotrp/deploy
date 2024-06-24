@@ -277,10 +277,17 @@ Match User redis-tun
   ForceCommand /bin/false
 ```
 
+Generate a key as the user without a password
+
+```
+ssh-keygen -t ecdsa -f id_ecdsa_sheepdog
+```
+
 Now make sure the ssh key is on the redis host and
 
 ```
-/usr/bin/ssh -i key -f -N -R 6377:localhost:6379 redis-tun@sheepdoghost
+/usr/bin/ssh -i id_ecdsa_sheepdog redis-tun@sheepdoghost
+/usr/bin/ssh -i id_ecdsa_sheepdog -f -N -L 6377:localhost:6379 redis-tun@sheepdoghost
 ```
 
 Next you should be able to connect with
