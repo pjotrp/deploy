@@ -301,8 +301,10 @@ And update sheepdog.conf accordingly
 A CRON entry may look like
 
 ```
-3 * * * * /usr/bin/ssh -i key -f -N -R 6377:localhost:6379 redis-tun@sheepdoghost >> tunnel.log &2>1
+3 * * * * /usr/bin/ssh -i key -f -N -L 6377:localhost:6379 redis-tun@sheepdoghost >> tunnel.log &2>1
 ```
+
+Note you can replace the -L swith with the -R switch to launche a *reverse* tunnel that would be initiatited from the other host.
 
 # Check for connections
 

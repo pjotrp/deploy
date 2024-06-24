@@ -1,9 +1,13 @@
 #!/usr/bin/env guile \
 -e main -s
 !#
-;; Minimal web server can be started from command line. Current routes:
+;; Minimal web server can be started from command line. As a guix container:
 ;;
-;;    localhost:8080/status.json
+;; guix shell -C -N --expose=$HOME/.config/sheepdog guile guile-redis guile-json -- guile -e main -s webserver.scm 8119
+;;
+;; Current routes:
+;;
+;;    localhost:8119/status.json
 ;;
 ;; Note that this is a single blocking thread server - that makes
 ;; sense to not to overload the local redis instance
