@@ -1,22 +1,19 @@
 # DEPLOY and SHEEPDOG
 
-This is a simple 'declarative' deployment system for servers and home
-directories.  In conjuction with GNU Guix and (perhaps) GWL and the
-common workflow langauge (CWL) essentially a replacement for Puppet,
-Chef, Cfengine, Cfruby, GNU stow, etc.  See the doc/design.org
-document for more.
+This is a simple 'declarative' deployment system for servers and home directories.  In conjuction with GNU Guix and (perhaps) GWL and the common workflow langauge (CWL) essentially a replacement for Puppet, Chef, Cfengine, Cfruby, GNU stow, etc.  See the doc/design.org document for more.
 
 The tooling comes with the `sheepdog`: a minimalist monitor and notification system.
 The purpose of `sheepdog' is to monitor problems in hardware and software on a larger setup.
 Events, such as a succeeding or failing backup, get pushed onto a message queue for later digestion.
+Sheepdog comes with its own webserver (in ./web/webserver.scm)
 
-Important notice: much of the work on deploy has been superceded by Guix and Guix home!
+Important notice: much of the work on deploy has been arguably superceded by Guix and Guix home! As a matter of fact we use all.
 
 => https://guix.gnu.org/manual/devel/en/html_node/Home-Configuration.html
 
-What remains is our faithful `sheepdog' to generate monitoring events and tools to process them.
+What remains of this effort is our faithful `sheepdog' to generate monitoring events and tools to process them.
 
-Pjotr Prins (c) 2015-2022
+Pjotr Prins (c) 2015-2024
 
 ## TODO
 
@@ -187,6 +184,13 @@ command line with `--password` or set in a file
 }
 ```
 
+Note the password is the one used by redis and set in redis.conf with:
+
+```
+# comment out the bind command to listen to other interfaces and
+requirepass 123456
+```
+
 Multiple hosts are supported in principle, but behaviour is (yet)
 undefined. When you specify a host on the command line it will send a
 message to that host using the password. Here, hostname will be the default
@@ -302,6 +306,10 @@ running the following on the queue
 
 will add a FAIL event if penguin2 has not connected in the last three
 hours, i.e. no messages where received in the queue.
+
+# A webserver
+
+Sheepdog comes with it own simple web server - see ./web/webserver.scm
 
 # Install
 
