@@ -1,0 +1,7 @@
+#!/bin/sh
+#
+# Starts up the sheepdog webserver
+#
+unset GUIX_PROFILE
+. ~/opt/guix/etc/profile
+guix shell -C -N --expose=/home/wrk/.config/sheepdog guile guile-redis guile-json -- guile -e main -s webserver.scm 8119
