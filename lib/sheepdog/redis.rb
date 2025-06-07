@@ -13,6 +13,9 @@ end
 def redis_ping(r,host)
   begin
     r.ping()
+  rescue Redis::TimeoutError
+    warning("redis on #{host} is timing out")
+    return false
   rescue Redis::CannotConnectError
     warning("redis on #{host} is not connecting")
     return false
@@ -21,6 +24,9 @@ def redis_ping(r,host)
     return false
   rescue Redis::ConnectionError
     warning("redis on #{host} connection error")
+    return false
+  rescue
+    warning("redis on #{host} unknown error")
     return false
   end
   true
