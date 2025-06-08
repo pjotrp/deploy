@@ -59,7 +59,7 @@ def redis_report(r, event, opts, filter = nil)
       print(select.call(event[:stdout]).blue,"\n")
       print(select.call(event[:stderr]).red,"\n")
       print(event2.to_s.green,"\n")
-      puts("Pushing out event <#{id}> to <#{opts.host}>\n".green)
+      puts("Pushing out event <#{id}> to <#{opts.host}:#{opts.port}>\n".green)
     end
     event[:stdout] = nil if (not opts.store_stdout) # reduce noise
     json = event.to_json
